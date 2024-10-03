@@ -1,9 +1,9 @@
 import { 
   Injectable,
   ConflictException,
-  BadRequestException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm/repository/Repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/api/common/entities/user.entity';
@@ -24,7 +24,7 @@ export class UsersService {
       where: { email },
     });
     if (existingUser) {
-      throw new BadRequestException('Email đã được sử dụng.');
+      throw new ConflictException('Email đã được sử dụng.');
     }
 
     const hashedPassword = await bcrypt.hash(hashed_password, 10);
@@ -37,22 +37,22 @@ export class UsersService {
 
     await this.userRepository.save(user);
 
-    return { message: 'Đăng ký người dùng thành công.'  };
+    return { message: 'Đăng ký người dùng thành công.' };
   }
 
   findAll() {
-    return ;
+    return `This action returns all users`;
   }
 
   findOne(id: number) {
-    return ;
+    return `This action returns a #${id} user`;
   }
 
-  update(id: number) {
-    return ;
+  update(id: number, updateUserDto: UpdateUserDto) {
+    return `This action updates a #${id} user`;
   }
 
   remove(id: number) {
-    return ;
+    return `This action removes a #${id} user`;
   }
 }
