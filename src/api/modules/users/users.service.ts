@@ -34,7 +34,7 @@ export class UsersService {
     });
 
     if (existUser) {
-      throw new BadRequestException('Email đã được sử dụng');
+      throw new BadRequestException('AUTH-0005');
     }
 
     await this.userRepository.save(user);
@@ -43,11 +43,11 @@ export class UsersService {
     const user = await this.userRepository.findOneBy({ email: loginDTO.email, is_verified: true });
 
     if (!user) {
-      throw new BadRequestException('Sai tài khoản hoặc mật khẩu');
+      throw new BadRequestException('AUTH-0002');
     }
 
     if (!(await bcrypt.compare(loginDTO.password, user.hashed_password))) {
-      throw new BadRequestException('Sai tài khoản hoặc mật khẩu');
+      throw new BadRequestException('AUTH-0002');
     }
 
     const queryRunner = this.dataSource.createQueryRunner();

@@ -6,23 +6,20 @@ import { Gender } from "src/api/common/enum/gender.enum";
 export class CreateUserDto {
 
     @Expose()
-    @IsEmail()
-    @IsNotEmpty({ message: "Vui lòng nhập email"})
+    @IsEmail({}, { message: 'AUTH-0003'})
+    @IsNotEmpty({ message: 'AUTH-0001'})
     email: string;
 
     @Expose()
-    @IsString()
-    @IsNotEmpty({ message: "Vui lòng nhập họ và tên"})
+    @IsNotEmpty({ message: "AUTH-0001"})
     full_name: string;
 
     @Expose()
-    @IsString()
     @IsEnum(Gender)
     gender: string;
 
     @Expose()
-    @IsString()
-    @IsStrongPassword({})
+    @IsStrongPassword({}, {message: "AUTH-0004"})
     password: string;
 
 }
