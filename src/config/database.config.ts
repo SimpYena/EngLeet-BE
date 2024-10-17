@@ -14,6 +14,7 @@ export const DatabaseConfig = (): TypeOrmModuleOptions => ({
   entities: ['dist/**/*.entity.js'],
   migrations: ['dist/database/migrations/*.js'],
   autoLoadEntities: true,
+  synchronize: true
 });
 
 const dataSource = new DataSource({ ...DatabaseConfig() } as DataSourceOptions);

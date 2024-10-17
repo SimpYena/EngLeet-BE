@@ -29,4 +29,6 @@ export class User {
     @UpdateDateColumn()
     updated_at: string
 
+    @Column({ nullable: true })
+    last_login?: Date;
 }
