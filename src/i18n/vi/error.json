@@ -16,8 +16,13 @@
   },
   "SYS-0004": {
     "error_id": "SYS-0004",
-    "title": "Lỗi hệ thống",
-    "message": "Đã xảy ra lỗi máy chủ nội bộ."
+    "title": "Có người đang sử dụng token không đã bị thu hồi",
+    "message": "Ai đó đang cố đăng nhập vào tài khoản của bạn. Vui lòng kiểm tra và đăng nhập lại để tiếp tục sử dụng."
+  },
+  "SYS-0005": {
+    "error_id": "SYS-0005",
+    "title": "Xác thực người dùng đã hết hạn",
+    "message": "Ngày hết hạn xác thực người dùng đã hết hạn. Hãy bắt đầu lại từ đầu."
   },
   "AUTH-0001": {
     "error_id": "AUTH-0001",

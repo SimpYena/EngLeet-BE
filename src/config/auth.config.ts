@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
+import { ExtractJwt } from 'passport-jwt';
 
 config({ path: '.env' });
 
@@ -11,5 +12,15 @@ export const RefreshTokenConfig = {
   secret: process.env.RT_SECRET,
   expiresIn: process.env.RT_EXPIRATION_TIME,
 };
+export const JwtStrategyConfig = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  ignoreExpiration: true,
+  secretOrKey: process.env.AT_SECRET,
+};
 
+export const RefreshJwtStrategyConfig = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  ignoreExpiration: true,
+  secretOrKey: process.env.RT_SECRET,
+};
 

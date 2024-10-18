@@ -1,6 +1,8 @@
 import { 
   Injectable,
   BadRequestException,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Repository } from 'typeorm/repository/Repository';
@@ -21,6 +23,8 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(RefreshToken)
+    private readonly refreshTokenRepository: Repository<RefreshToken>,
     private dataSource: DataSource,
     private jwtServices: JwtService
   ) {}
@@ -128,9 +132,74 @@ export class UsersService {
 
     return { jwtAccessToken, jwtRefreshToken };
   }
+  async handleRefreshToken(payload: any) {
+    const user = await this.userRepository.findOneBy({ id: payload.userId });
+
+    if (!user) {
+      throw new NotFoundException('SYS-0003');
+    }
+
+    const refreshToken = await this.refreshTokenRepository.findOne({
+      where: { id: payload.refreshTokenId },
+      relations: ['access_token', 'access_token.user'],
+    });
+
+    if (!refreshToken) {
+      throw new UnauthorizedException('SYS-0004');
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const { accessTokenSaved, refreshTokenSaved } = await this.saveTokens(
+        user,
+        queryRunner,
+      );
+
+      const { jwtAccessToken, jwtRefreshToken } = await this.generateTokens(
+        user,
+        accessTokenSaved,
+        refreshTokenSaved,
+      );
+
+      await this.revokeTokens(
+        refreshToken.access_token.id,
+        refreshToken.id,
+        queryRunner,
+      );
+
+      await queryRunner.commitTransaction();
+
+      return {
+        access_token: jwtAccessToken,
+        refresh_token: jwtRefreshToken,
+        expires_at: accessTokenSaved.expires_at.toLocaleString(),
+      };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
   async updateLastLogin(userId: number, queryRunner: QueryRunner) {
     await queryRunner.manager.update(User, userId, {
       last_login: new Date(Date.now()),
+    });
+  }
+  async revokeTokens(
+    accessTokenId: number,
+    refreshTokenId: number,
+    queryRunner: QueryRunner,
+  ) {
+    await queryRunner.manager.delete(RefreshToken, {
+      id: refreshTokenId,
+    });
+
+    await queryRunner.manager.delete(AccessToken, {
+      id: accessTokenId,
     });
   }
 }
