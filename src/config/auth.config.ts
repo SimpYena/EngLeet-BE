@@ -24,3 +24,8 @@ export const RefreshJwtStrategyConfig = {
   secretOrKey: process.env.RT_SECRET,
 };
 
+export const VerifyTokenConfig = {
+  secret: process.env.VERIFY_SECRET,
+  expiresIn: process.env.VERIFY_EXPIRATION_TIME,
+};
+

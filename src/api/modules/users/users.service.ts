@@ -13,9 +13,11 @@ import { plainToInstance } from 'class-transformer';
 import { LoginDTO } from './dto/login.dto';
 import { DataSource, QueryRunner } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { AccessTokenConfig, RefreshTokenConfig } from 'src/config/auth.config';
+import { AccessTokenConfig, RefreshTokenConfig, VerifyTokenConfig } from 'src/config/auth.config';
 import { AccessToken } from 'src/api/common/entities/access-token.entity';
 import { RefreshToken } from 'src/api/common/entities/refresh-token.entity';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class UsersService {
@@ -26,7 +28,9 @@ export class UsersService {
     @InjectRepository(RefreshToken)
     private readonly refreshTokenRepository: Repository<RefreshToken>,
     private dataSource: DataSource,
-    private jwtServices: JwtService
+    private jwtServices: JwtService,
+    @InjectQueue('send-mail')
+    private sendMailQueue: Queue,
   ) {}
 
   async register(createUserDTO: CreateUserDto) {
@@ -41,7 +45,11 @@ export class UsersService {
       throw new BadRequestException('AUTH-0005');
     }
 
-    await this.userRepository.save(user);
+    const newUser = await this.userRepository.save(user);
+
+    
+    return await this.sendMail(newUser.id, createUserDTO.email, createUserDTO.full_name);
+  
   }
   async login(loginDTO: LoginDTO) {
     const user = await this.userRepository.findOneBy({ email: loginDTO.email, is_verified: true });
@@ -201,5 +209,22 @@ export class UsersService {
     await queryRunner.manager.delete(AccessToken, {
       id: accessTokenId,
     });
+  }
+  async sendMail(userId: number, email: string, full_name: string){
+    const payload = {id: userId};
+
+    const verifyToken = await this.jwtServices.signAsync(
+      payload,
+      VerifyTokenConfig,
+    );
+
+    const mailURL = process.env.MAIL_URL;
+
+    await this.sendMailQueue.add('register',{
+      to: email,
+      name: full_name,
+      verifyToken,
+      mailURL
+    })
   }
 }

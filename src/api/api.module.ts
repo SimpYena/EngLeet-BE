@@ -7,6 +7,10 @@ import { APP_INTERCEPTOR } from "@nestjs/core";
 import { ResponseInterceptor } from "./common/interceptors/response.interceptors";
 import { I18nModule } from "nestjs-i18n";
 import { I18nConfig } from "src/config/i18.config";
+import { BullModule } from "@nestjs/bull";
+import { BullConfig } from "src/config/bull.config";
+import { MailerModule } from "@nestjs-modules/mailer";
+import { MailConfig } from "src/config/mail.config";
 
 
 @Module({
@@ -15,6 +19,12 @@ import { I18nConfig } from "src/config/i18.config";
         TypeOrmModule.forRootAsync({
             useFactory: () => DatabaseConfig()
         }),
+        BullModule.forRootAsync({
+            useFactory: () => BullConfig()
+        }),
+        MailerModule.forRootAsync({
+            useFactory: () => MailConfig(),
+          }),
         I18nModule.forRoot(I18nConfig),
         UsersModule
     ],
