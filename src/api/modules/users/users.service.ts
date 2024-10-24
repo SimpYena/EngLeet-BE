@@ -254,4 +254,30 @@ export class UsersService {
       throw new UnauthorizedException('AUTH-0009');
     }
   }
+  
+  async logout(payload: any) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const refreshToken = await this.refreshTokenRepository.findOne({
+        where: { access_token: { id: payload.accessTokenId } },
+        relations: ['access_token', 'access_token.user'],
+      });
+
+      await this.revokeTokens(
+        refreshToken.access_token.id,
+        refreshToken.id,
+        queryRunner,
+      );
+
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
 }

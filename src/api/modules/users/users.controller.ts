@@ -1,10 +1,11 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, UseGuards, Request, Param, Patch } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, UseGuards, Request, Param, Patch, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { plainToInstance } from 'class-transformer';
 import { LoginDTO } from './dto/login.dto';
 import { TokenDTO } from './dto/token.dto';
 import { RefreshTokenJwtGuard } from './guards/refresh-token-auth.guard';
+import { JwtGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class UsersController {
@@ -35,6 +36,13 @@ export class UsersController {
   @Patch('verify-email/:token')
   async verifyEmail(@Param('token') token: string){    
     await this.usersService.verifyEmail(token);
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(@Request() req): Promise<void> {
+    await this.usersService.logout(req.user);
   }
 
 }
