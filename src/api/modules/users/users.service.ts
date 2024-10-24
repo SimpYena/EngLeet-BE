@@ -280,4 +280,16 @@ export class UsersService {
       await queryRunner.release();
     }
   }
+
+  async getCurrentUser(user: any): Promise<User> {
+    const currentUser = await this.userRepository.findOne({
+      where: { id: user.userId },
+    });
+
+    if (!currentUser) {
+      throw new UnauthorizedException('SYS-0001');
+    }
+
+    return currentUser;
+  }
 }
