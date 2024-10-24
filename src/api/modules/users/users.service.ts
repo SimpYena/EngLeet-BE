@@ -1,4 +1,4 @@
-import { 
+import {
   Injectable,
   BadRequestException,
   NotFoundException,
@@ -13,7 +13,11 @@ import { plainToInstance } from 'class-transformer';
 import { LoginDTO } from './dto/login.dto';
 import { DataSource, QueryRunner } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { AccessTokenConfig, RefreshTokenConfig, VerifyTokenConfig } from 'src/config/auth.config';
+import {
+  AccessTokenConfig,
+  RefreshTokenConfig,
+  VerifyTokenConfig,
+} from 'src/config/auth.config';
 import { AccessToken } from 'src/api/common/entities/access-token.entity';
 import { RefreshToken } from 'src/api/common/entities/refresh-token.entity';
 import { InjectQueue } from '@nestjs/bull';
@@ -21,7 +25,6 @@ import { Queue } from 'bull';
 
 @Injectable()
 export class UsersService {
-
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -47,12 +50,17 @@ export class UsersService {
 
     const newUser = await this.userRepository.save(user);
 
-    
-    return await this.sendMail(newUser.id, createUserDTO.email, createUserDTO.full_name);
-  
+    return await this.sendMail(
+      newUser.id,
+      createUserDTO.email,
+      createUserDTO.full_name,
+    );
   }
   async login(loginDTO: LoginDTO) {
-    const user = await this.userRepository.findOneBy({ email: loginDTO.email, is_verified: true });
+    const user = await this.userRepository.findOneBy({
+      email: loginDTO.email,
+      is_verified: true,
+    });
 
     if (!user) {
       throw new BadRequestException('AUTH-0002');
@@ -83,7 +91,6 @@ export class UsersService {
       await queryRunner.commitTransaction();
 
       console.log(accessTokenSaved.expires_at.toLocaleString());
-      
 
       return {
         access_token: jwtAccessToken,
@@ -99,7 +106,7 @@ export class UsersService {
   }
   async saveTokens(user: User, queryRunner: QueryRunner) {
     const expiresAt = new Date(
-      Date.now() + parseFloat(AccessTokenConfig.expiresIn)
+      Date.now() + parseFloat(AccessTokenConfig.expiresIn),
     );
 
     const accessTokenSaved = await queryRunner.manager.save(AccessToken, {
@@ -210,8 +217,8 @@ export class UsersService {
       id: accessTokenId,
     });
   }
-  async sendMail(userId: number, email: string, full_name: string){
-    const payload = {id: userId};
+  async sendMail(userId: number, email: string, full_name: string) {
+    const payload = { id: userId };
 
     const verifyToken = await this.jwtServices.signAsync(
       payload,
@@ -220,11 +227,31 @@ export class UsersService {
 
     const mailURL = process.env.MAIL_URL;
 
-    await this.sendMailQueue.add('register',{
+    await this.sendMailQueue.add('register', {
       to: email,
       name: full_name,
       verifyToken,
-      mailURL
-    })
+      mailURL,
+    });
+  }
+  async verifyEmail(token: string): Promise<void> {
+    try {
+            
+      const payload = await this.jwtServices.verifyAsync(
+        token,
+        VerifyTokenConfig,
+      );
+      
+
+      await this.userRepository.update(
+        { id: payload.id },
+        { is_verified: true },
+      );
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('AUTH-0010');
+      }
+      throw new UnauthorizedException('AUTH-0009');
+    }
   }
 }
