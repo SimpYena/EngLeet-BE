@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, UseGuards, Request, Param, Patch } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { plainToInstance } from 'class-transformer';
@@ -31,4 +31,10 @@ export class UsersController {
       await this.usersService.handleRefreshToken(req.user),
     );
   }
+
+  @Patch('verify-email/:token')
+  async verifyEmail(@Param('token') token: string){    
+    await this.usersService.verifyEmail(token);
+  }
+
 }

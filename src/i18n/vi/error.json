@@ -52,5 +52,15 @@
     "field": "email",
     "title": "Email đã tồn tại.",
     "message": "Email bạn nhập đã tồn tại. Vui lòng nhập email khác để tiếp tục."
+  },
+  "AUTH-0009": {
+    "error_id": "AUTH-0009",
+    "title": "Token không hợp lệ.",
+    "message": "Có lỗi xảy ra khi xác thực email, vui lòng thử lại."
+  },
+  "AUTH-0010": {
+    "error_id": "AUTH-0010",
+    "title": "Token đã hết hạn",
+    "message": "Token đã hết hạn, vui lòng làm mới lại token."
   }
 }
