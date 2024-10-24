@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, UseGuards, Request, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, UseGuards, Request, Param, Patch, Delete, Get, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { plainToInstance } from 'class-transformer';
@@ -6,6 +6,7 @@ import { LoginDTO } from './dto/login.dto';
 import { TokenDTO } from './dto/token.dto';
 import { RefreshTokenJwtGuard } from './guards/refresh-token-auth.guard';
 import { JwtGuard } from './guards/jwt-auth.guard';
+import { ViewUserDTO } from './dto/view-user.dto';
 
 @Controller('auth')
 export class UsersController {
@@ -45,4 +46,13 @@ export class UsersController {
     await this.usersService.logout(req.user);
   }
 
+  @UseGuards(JwtGuard)
+  @Get('me')
+  @HttpCode(HttpStatus.OK)
+  async getCurrentUser(@Req() req): Promise<ViewUserDTO> {
+    return plainToInstance(
+      ViewUserDTO,
+      await this.usersService.getCurrentUser(req.user),
+    );
+  }
 }
