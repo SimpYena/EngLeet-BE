@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { AccessToken } from './access-token.entity';
 
-@Entity({ name: 'refresh_tokens' })
+@Entity('refresh_tokens')
 export class RefreshToken {
   @PrimaryGeneratedColumn()
   id: number;

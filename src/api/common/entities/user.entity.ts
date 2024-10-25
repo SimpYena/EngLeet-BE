@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, DeleteDateColumn, CreateDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, DeleteDateColumn, CreateDateColumn, OneToMany } from "typeorm";
+import { Review } from "./review.entity";
 
-@Entity()
+@Entity('users')
 export class User {
     @PrimaryGeneratedColumn()
     id: number
@@ -20,15 +21,19 @@ export class User {
     @Column({ default: false , nullable: false })
     is_verified: boolean
 
-    @CreateDateColumn()
-    created_at: string
-
-    @DeleteDateColumn()
-    deleted_at: string
-
+    @CreateDateColumn({ nullable: false })
+    created_at?: Date;
+  
     @UpdateDateColumn()
-    updated_at: string
+    updated_at?: Date;
+  
+    @DeleteDateColumn()
+    deleted_at?: Date;
 
     @Column({ nullable: true })
     last_login?: Date;
-}
+
+    @OneToMany(() => Review, (review) => review.user)
+    review: Review;
+  }
+
