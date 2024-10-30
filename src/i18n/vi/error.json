@@ -67,5 +67,11 @@
     "error_id": "FILE-0001",
     "title": "File không tồn tại",
     "message": "File không tồn tại, vui lòng gửi file lại và bấm xác thực"
+  },
+  "BAD-0001": {
+    "error_id": "BAD-0001",
+    "field": "{field}",
+    "title": "Kiểu dữ liệu không chính xác",
+    "message": "{field} có kiểu dữ liệu chưa chính xác. Vui lòng nhập lại."
   }
 }
