@@ -11,6 +11,7 @@ import { BullModule } from "@nestjs/bull";
 import { BullConfig } from "src/config/bull.config";
 import { MailerModule } from "@nestjs-modules/mailer";
 import { MailConfig } from "src/config/mail.config";
+import { QuizzModule } from "./modules/quizz/quizz.module";
 
 
 @Module({
@@ -26,7 +27,8 @@ import { MailConfig } from "src/config/mail.config";
             useFactory: () => MailConfig(),
           }),
         I18nModule.forRoot(I18nConfig),
-        UsersModule
+        UsersModule,
+        QuizzModule
     ],
     providers: [
         {
