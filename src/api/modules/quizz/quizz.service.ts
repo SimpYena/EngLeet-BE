@@ -8,6 +8,8 @@ import { plainToInstance } from 'class-transformer';
 import { ListeningQuizzDTO } from './dto/listening-quizz.dto';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { v4 as uuid } from 'uuid';
+import { PaginationOptionsDTO } from 'src/api/common/dto/pagination-options.dto';
+import { PaginationDTO } from 'src/api/common/dto/pagination.dto';
 
 @Injectable()
 export class QuizzService {
@@ -53,5 +55,15 @@ export class QuizzService {
     });
 
     await this.listeningQuizzRepository.save(saveQuizz);
+  }
+  getPagination(
+    total: number,
+    paginationOptionsDTO: PaginationOptionsDTO,
+  ): PaginationDTO {
+    return {
+      total,
+      limit: paginationOptionsDTO.limit,
+      offset: paginationOptionsDTO.offset,
+    };
   }
 }
