@@ -62,5 +62,10 @@
     "error_id": "AUTH-0010",
     "title": "Token đã hết hạn",
     "message": "Token đã hết hạn, vui lòng làm mới lại token."
+  },
+  "FILE-0001":{
+    "error_id": "FILE-0001",
+    "title": "File không tồn tại",
+    "message": "File không tồn tại, vui lòng gửi file lại và bấm xác thực"
   }
 }

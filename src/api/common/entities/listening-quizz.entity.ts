@@ -24,7 +24,7 @@ export class ListeningQuizz {
     @Column({nullable: false, type: 'json'})
     answer: JSON;
 
-    @Column({nullable: false, type: 'json'})
+    @Column({nullable: false})
     correct_answer: string;
 
     @Column({nullable: false})
