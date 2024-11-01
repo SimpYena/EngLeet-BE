@@ -1,6 +1,7 @@
 import { Exclude, Expose } from 'class-transformer';
 import { IsArray, IsEnum, IsNumber, IsString } from 'class-validator';
 import { Difficulty } from 'src/api/common/enum/difficulty.enum';
+import { Type } from 'src/api/common/enum/type.enum';
 
 @Exclude()
 export class ReadingQuizzDTO {
@@ -35,4 +36,8 @@ export class ReadingQuizzDTO {
   @IsNumber()
   @Expose()
   acceptance: number;
+
+  @IsEnum(Type)
+  @Expose()
+  type: string;
 }
