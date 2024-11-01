@@ -8,7 +8,7 @@ export class PaginationOptionsDTO {
 
   @Transform(({ value }) => (parseInt(value) >= 0 ? parseInt(value) : 20))
   @IsInt({ message: 'BAD-0001' })
-  limit: number = 20;
+  limit: number = 10;
 
   @Transform(({ value }) => (value ? value.split(',').map(String) : []))
   @IsArray()

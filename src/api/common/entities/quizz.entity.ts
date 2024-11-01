@@ -2,9 +2,10 @@ import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToO
 import { Difficulty } from "../enum/difficulty.enum";
 import { QuestionTopic } from "./question-topic.entity";
 import { Review } from "./review.entity";
+import { Type } from "../enum/type.enum";
 
-@Entity('reading_quizz')
-export class ReadingQuizz {
+@Entity('quizz')
+export class Quizz {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -12,7 +13,7 @@ export class ReadingQuizz {
     title: string;
 
     @ManyToOne(() => QuestionTopic)
-    @JoinColumn({ name: 'topic_id', foreignKeyConstraintName: 'fk_topic_reading' })
+    @JoinColumn({ name: 'topic_id', foreignKeyConstraintName: 'fk_topic_listening' })
     topic: QuestionTopic;
 
     @Column({nullable: false})
@@ -26,6 +27,9 @@ export class ReadingQuizz {
 
     @Column({nullable: false})
     correct_answer: string;
+
+    @Column({nullable: true})
+    audio_link: string;
 
     @Column({nullable: false})
     score: number;
@@ -42,6 +46,9 @@ export class ReadingQuizz {
     @DeleteDateColumn()
     deleted_at?: Date;
 
-    @OneToMany(() => Review, (review) => review.rQuizz)
+    @OneToMany(() => Review, (review) => review.quizz)
     review: Review;
+
+    @Column({nullable: false})
+    type: Type;
 }

@@ -1,7 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
-import { ListeningQuizz } from "./listening-quizz.entity";
-import { ReadingQuizz } from "./reading-quizz.entity";
+import { Quizz } from "./quizz.entity";
 
 @Entity('review')
 export class Review{
@@ -15,11 +14,7 @@ export class Review{
     @Column({ length: 255 })
     description: string;
 
-    @ManyToOne(() => ListeningQuizz)
-    @JoinColumn({ name: 'quizz_id', foreignKeyConstraintName: 'fk_lquizz_review' })
-    lQuizz: ListeningQuizz;   
-
-    @ManyToOne(() => ReadingQuizz)
-    @JoinColumn({ name: 'quizz_id', foreignKeyConstraintName: 'fk_rquizz_review' })
-    rQuizz: ListeningQuizz;   
+    @ManyToOne(() => Quizz)
+    @JoinColumn({ name: 'quizz_id', foreignKeyConstraintName: 'fk_quizz_review' })
+    quizz: Quizz;   
 }

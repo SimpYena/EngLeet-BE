@@ -1,6 +1,7 @@
 import { Exclude, Expose, Type } from 'class-transformer';
 import { IsArray, IsEnum, IsNumber, IsString } from 'class-validator';
 import { Difficulty } from 'src/api/common/enum/difficulty.enum';
+import { Type as type} from 'src/api/common/enum/type.enum';
 
 @Exclude()
 export class ListeningQuizzDTO {
@@ -41,4 +42,8 @@ export class ListeningQuizzDTO {
 
   @Expose()
   audio_link: string;
+
+  @IsEnum(type)
+  @Expose()
+  type: string;
 }
