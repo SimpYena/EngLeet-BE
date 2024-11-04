@@ -15,6 +15,7 @@ import { QuizzService } from './quizz.service';
 import { ListeningQuizzDTO } from './dto/listening-quizz.dto';
 import { SearchParamsDTO } from './dto/search-params.dto';
 import { PaginationOptionsDTO } from 'src/api/common/dto/pagination-options.dto';
+import { GetID } from 'src/api/common/decorator/get-id.decorator';
 
 @Controller('quizz')
 export class QuizzController {
@@ -46,5 +47,11 @@ export class QuizzController {
         searchParamsDTO,
         paginationOptionsDTO
     )
+  }
+
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  async getQuizzById(@GetID('id') id: number){
+    return this.quizzService.getQuizzDetails(id);
   }
 }
