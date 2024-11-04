@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ReadingQuizzDTO } from './dto/reading-quizz.dto';
@@ -11,6 +11,7 @@ import { PaginationDTO } from 'src/api/common/dto/pagination.dto';
 import { SearchParamsDTO } from './dto/search-params.dto';
 import { ViewQuizzDTO } from './dto/view-quizz.dto';
 import { Quizz } from 'src/api/common/entities/quizz.entity';
+import { QuizzDetailDTO } from './dto/quizz-details.dto';
 
 @Injectable()
 export class QuizzService {
@@ -112,6 +113,26 @@ export class QuizzService {
         topics: searchParamsDTO.topics,
       });
     }
+  }
+  async getQuizzDetails(id: number){
+    const queryBuilder = this.quizzRepository.createQueryBuilder('quizz');
+
+    queryBuilder.innerJoinAndSelect('quizz.topic', 'topic');
+
+    queryBuilder.andWhere('quizz.id = :id', {id})
+
+    const quizz = await queryBuilder.getOne();
+
+    if (!quizz) throw new NotFoundException('SYS-0003');
+
+    if(quizz.type === 'Listening' && quizz.audio_link == null){
+      throw new NotFoundException('SYS-0003');
+    }
+
+    return plainToInstance(QuizzDetailDTO,
+      {...quizz,
+      audio_link: quizz.audio_link
+    })
   }
 
   getPagination(
