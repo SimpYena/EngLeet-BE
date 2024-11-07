@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ReadingQuizzDTO } from './dto/reading-quizz.dto';
@@ -40,7 +45,7 @@ export class QuizzService {
     }
 
     if (!file) {
-      throw new BadRequestException('SYS-0001');
+      throw new BadRequestException('SYS-0002');
     }
 
     const fileKey = uuid();
@@ -55,7 +60,7 @@ export class QuizzService {
       }),
     );
 
-    const s3Url = `${process.env.S3_BASE_URL}/${bucketName}/${fileKey}`;
+    const s3Url = `${process.env.S3_BASE_URL}/${fileKey}`;
 
     const saveQuizz = plainToInstance(Quizz, {
       ...listeningQuizz,
@@ -114,25 +119,25 @@ export class QuizzService {
       });
     }
   }
-  async getQuizzDetails(id: number){
+  async getQuizzDetails(id: number) {
     const queryBuilder = this.quizzRepository.createQueryBuilder('quizz');
 
     queryBuilder.innerJoinAndSelect('quizz.topic', 'topic');
 
-    queryBuilder.andWhere('quizz.id = :id', {id})
+    queryBuilder.andWhere('quizz.id = :id', { id });
 
     const quizz = await queryBuilder.getOne();
 
     if (!quizz) throw new NotFoundException('SYS-0003');
 
-    if(quizz.type === 'Listening' && quizz.audio_link == null){
+    if (quizz.type === 'Listening' && quizz.audio_link == null) {
       throw new NotFoundException('SYS-0003');
     }
 
-    return plainToInstance(QuizzDetailDTO,
-      {...quizz,
-      audio_link: quizz.audio_link
-    })
+    return plainToInstance(QuizzDetailDTO, {
+      ...quizz,
+      audio_link: quizz.audio_link,
+    });
   }
 
   getPagination(

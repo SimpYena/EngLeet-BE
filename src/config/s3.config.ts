@@ -8,6 +8,5 @@ export const S3Config = (): S3ClientConfig => ({
   credentials: {
     accessKeyId: process.env.S3_ACCESS_KEY,
     secretAccessKey: process.env.S3_SECRET_KEY,
-  },
-  endpoint: process.env.S3_ENDPOINT,
+  }
 });
