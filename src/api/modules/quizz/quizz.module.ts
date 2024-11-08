@@ -5,9 +5,10 @@ import { QuizzService } from './quizz.service';
 import { S3Client } from '@aws-sdk/client-s3';
 import { S3Config } from 'src/config/s3.config';
 import { Quizz } from 'src/api/common/entities/quizz.entity';
+import { QuizzSubmitted } from 'src/api/common/entities/quizz-submitted.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Quizz])],
+  imports: [TypeOrmModule.forFeature([Quizz, QuizzSubmitted])],
   controllers: [QuizzController],
   providers: [
     QuizzService,

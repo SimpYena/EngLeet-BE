@@ -17,6 +17,7 @@ import { SearchParamsDTO } from './dto/search-params.dto';
 import { ViewQuizzDTO } from './dto/view-quizz.dto';
 import { Quizz } from 'src/api/common/entities/quizz.entity';
 import { QuizzDetailDTO } from './dto/quizz-details.dto';
+import { QuizzSubmitted } from 'src/api/common/entities/quizz-submitted.entity';
 
 @Injectable()
 export class QuizzService {
@@ -24,6 +25,8 @@ export class QuizzService {
     @InjectRepository(Quizz)
     private readonly quizzRepository: Repository<Quizz>,
     @Inject('S3_CLIENT') private readonly s3: S3Client,
+    @InjectRepository(QuizzSubmitted)
+    private readonly quizzSubmittedRepository: Repository<QuizzSubmitted>,
   ) {}
 
   async createReadingQuizz(readingQuizz: ReadingQuizzDTO) {
@@ -148,6 +151,106 @@ export class QuizzService {
       total,
       limit: paginationOptionsDTO.limit,
       offset: paginationOptionsDTO.offset,
+    };
+  }
+  async submitQuizz(id: any, user: any, answer: any) {
+    const quizz = await this.quizzRepository.findOneBy({
+      id: id,
+    });
+
+    if (!quizz) {
+      throw new BadRequestException();
+    }
+
+    const submittedQuizz = await this.quizzSubmittedRepository.findOneBy({
+      quizz: { id: id },
+      user: { id: user.userId },
+    });
+
+    if (submittedQuizz) {
+      return await this.updateQuizzSubmit(
+        answer.answer,
+        quizz.correct_answer,
+        submittedQuizz.id,
+        quizz.score,
+        submittedQuizz.attempt,
+      );
+    }
+
+    return await this.saveQuizzSubmit(
+      answer.answer,
+      quizz.correct_answer,
+      user.userId,
+      quizz.id,
+      quizz.score,
+    );
+  }
+  async updateQuizzSubmit(
+    answer: string,
+    correctAnswer: string,
+    quizzId: number,
+    score: number,
+    attempt: number,
+  ) {
+    if (answer === correctAnswer) {
+      await this.quizzSubmittedRepository.update(
+        { id: quizzId },
+        {
+          attempt: attempt + 1,
+          score: score,
+        },
+      );
+
+      return {
+        status: 'Correct',
+        score: score,
+        attempt: attempt + 1,
+      };
+    }
+    await this.quizzSubmittedRepository.update(
+      { id: quizzId },
+      {
+        attempt: attempt + 1,
+      },
+    );
+
+    return {
+      status: 'Incorrect',
+      score: 0,
+      attempt: attempt + 1,
+    };
+  }
+  async saveQuizzSubmit(
+    answer: string,
+    correctAnswer: string,
+    userId: number,
+    quizzId: number,
+    score: number,
+  ) {
+    let attempt = 0;
+    if (answer === correctAnswer) {
+      await this.quizzSubmittedRepository.save({
+        attempt: attempt + 1,
+        user: { id: userId },
+        quizz: { id: quizzId },
+        score,
+      });
+      return {
+        status: 'Correct',
+        score: score,
+        attempt: attempt + 1,
+      };
+    }
+    await this.quizzSubmittedRepository.save({
+      attempt: attempt + 1,
+      user: { id: userId },
+      quizz: { id: quizzId },
+      score: 0,
+    });
+    return {
+      status: 'Incorrect',
+      score: 0,
+      attempt: attempt + 1,
     };
   }
 }
