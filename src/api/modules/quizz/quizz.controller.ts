@@ -6,7 +6,9 @@ import {
   HttpStatus,
   Post,
   Query,
+  Req,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -16,6 +18,7 @@ import { ListeningQuizzDTO } from './dto/listening-quizz.dto';
 import { SearchParamsDTO } from './dto/search-params.dto';
 import { PaginationOptionsDTO } from 'src/api/common/dto/pagination-options.dto';
 import { GetID } from 'src/api/common/decorator/get-id.decorator';
+import { JwtGuard } from '../users/guards/jwt-auth.guard';
 
 @Controller('quizz')
 export class QuizzController {
@@ -53,5 +56,12 @@ export class QuizzController {
   @HttpCode(HttpStatus.OK)
   async getQuizzById(@GetID('id') id: number){
     return this.quizzService.getQuizzDetails(id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post(':id')
+  @HttpCode(HttpStatus.OK)
+  async submitQuizz(@GetID('id') id: number, @Req() req, @Body() answer){
+    return this.quizzService.submitQuizz(id, req.user, answer);
   }
 }

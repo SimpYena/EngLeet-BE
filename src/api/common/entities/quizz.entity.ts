@@ -3,6 +3,7 @@ import { Difficulty } from "../enum/difficulty.enum";
 import { QuestionTopic } from "./question-topic.entity";
 import { Review } from "./review.entity";
 import { Type } from "../enum/type.enum";
+import { QuizzSubmitted } from "./quizz-submitted.entity";
 
 @Entity('quizz')
 export class Quizz {
@@ -51,4 +52,7 @@ export class Quizz {
 
     @Column({nullable: false})
     type: Type;
+
+    @OneToMany(() => QuizzSubmitted, (quizzSubmit) => quizzSubmit.quizz)
+    quizzSubmit: QuizzSubmitted;
 }

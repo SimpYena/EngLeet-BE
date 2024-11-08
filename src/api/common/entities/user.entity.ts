@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, DeleteDateColumn, CreateDateColumn, OneToMany } from "typeorm";
 import { Review } from "./review.entity";
+import { QuizzSubmitted } from "./quizz-submitted.entity";
 
 @Entity('users')
 export class User {
@@ -35,5 +36,8 @@ export class User {
 
     @OneToMany(() => Review, (review) => review.user)
     review: Review;
+
+    @OneToMany(() => QuizzSubmitted, (quizzSubmit) => quizzSubmit.quizz)
+    quizzSubmit: QuizzSubmitted;
   }
 
