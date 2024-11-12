@@ -1,0 +1,83 @@
+{
+  "SYS-0001": {
+    "error_id": "SYS-0001",
+    "title": "User not authenticated",
+    "message": "User authentication is not done. You need to log in again."
+  },
+  "SYS-0002": {
+    "error_id": "SYS-0002",
+    "title": "System error",
+    "message": "One or more field input values are invalid. Please check again."
+  },
+  "SYS-0003": {
+    "error_id": "SYS-0003",
+    "title": "System error",
+    "message": "An internal server error occurred. Please contact us if the problem is not solved."
+  },
+  "SYS-0004": {
+    "error_id": "SYS-0004",
+    "title": "Is someone using a token that has been revoked?",
+    "message": "Someone is trying to sign in to your account. Please check and log in again to continue using."
+  },
+  "SYS-0005": {
+    "error_id": "SYS-0005",
+    "title": "User authentication expired",
+    "message": "The expiration date of user authentication has expired. Please start over again from the beginning."
+  },
+  "AUTH-0001": {
+    "error_id": "AUTH-0001",
+    "field": "{field}",
+    "title": "Missing value",
+    "message": "You have entered incomplete information. Please provide all the necessary details to proceed."
+  },
+  "AUTH-0002": {
+    "error_id": "AUTH-0002",
+    "title": "Unauthorized",
+    "message": "Your email or password is incorrect, please re-enter."
+  },
+  "AUTH-0003": {
+    "error_id": "AUTH-0003",
+    "field": "email",
+    "title": "Invalid email",
+    "message": "You have entered invalid email. Please provide a valid email to continue."
+  },
+  "AUTH-0004": {
+    "error_id": "AUTH-0004",
+    "field": "password",
+    "title": "Weak password",
+    "message": "You have entered a weak password, please re-enter the stronger password."
+  },
+  "AUTH-0005": {
+    "error_id": "AUTH-0005",
+    "field": "email",
+    "title": "Existed email",
+    "message": "You have entered exist email. Please use another email to proceed."
+  },
+  "AUTH-0006": {
+    "error_id": "AUTH-0006",
+    "field": "gender",
+    "title": "Invalid gender",
+    "message": "You have choose invalid gender, please choose only Male, Female and None"
+  },
+  "AUTH-0009": {
+    "error_id": "AUTH-0009",
+    "title": "Invalid token",
+    "message": "There is an error when verify your email, please try again."
+  },
+  "AUTH-0010": {
+    "error_id": "AUTH-0010",
+    "title": "Token Expired",
+    "message": "Token is expired."
+  },
+  "FILE-0001":{
+    "error_id": "FILE-0001",
+    "title": "File doesn't exist",
+    "message": "File doesn't exist, please re-send with new file and submit again"
+  },
+  "BAD-0001": {
+    "error_id": "BAD-0001",
+    "field": "{field}",
+    "title": "Incorrect data type",
+    "message": "{field} has an incorrect data type. Please re-enter."
+  }
+}
