@@ -1,6 +1,6 @@
 export enum Difficulty {
-    Hard = 'Khó',
-    Medium = 'Thường',
-    Easy = 'Dễ'
+    Hard = 'Hard',
+    Medium = 'Medium',
+    Easy = 'Easy'
   }
   
