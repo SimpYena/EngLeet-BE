@@ -27,6 +27,6 @@ export class SectionContext {
   @Column({ type: 'text', nullable: true })
   passage: string;
 
-  @OneToMany(() => TestQuestion, (question) => question.sectionContext)
+  @OneToMany(() => TestQuestion, (question) => question.section_context)
   question: TestQuestion;
 }

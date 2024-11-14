@@ -8,7 +8,10 @@ export class TestQuestion {
 
     @ManyToOne(()=> SectionContext)
     @JoinColumn({name:'section_context_id', foreignKeyConstraintName: 'fk_context_question'})
-    sectionContext: SectionContext
+    section_context: SectionContext
+
+    @Column({nullable: false})
+    question: string;
 
     @Column({type: 'json', nullable: false})
     answer: JSON

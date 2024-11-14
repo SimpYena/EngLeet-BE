@@ -13,6 +13,7 @@ export const DatabaseConfig = (): TypeOrmModuleOptions => ({
   database: process.env.DB_NAME,
   entities: ['dist/**/*.entity.js'],
   migrations: ['dist/database/migrations/*.js'],
+  logger: 'debug',
   autoLoadEntities: true,
   synchronize: true
 });
