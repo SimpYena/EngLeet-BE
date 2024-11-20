@@ -8,9 +8,10 @@ import { Section } from 'src/api/common/entities/section.entity';
 import { SectionContext } from 'src/api/common/entities/section-context.entity';
 import { TestQuestion } from 'src/api/common/entities/test-question.entity';
 import { TestService } from './test.service';
+import { TestCategory } from 'src/api/common/entities/test-category.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Test, Section, SectionContext, TestQuestion])],
+  imports: [TypeOrmModule.forFeature([Test, Section, SectionContext, TestQuestion, TestCategory])],
   controllers: [TestController],
   providers: [
     TestService,
