@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationOptionsDTO } from 'src/api/common/dto/pagination-options.dto';
 import { PaginationDTO } from 'src/api/common/dto/pagination.dto';
 import { Test } from 'src/api/common/entities/test.entity';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { SectionDTO } from './dto/section.dto';
 import { Section } from 'src/api/common/entities/section.entity';
@@ -19,6 +19,8 @@ import { TestDTO } from './dto/test.dto';
 import { SectionContextDTO } from './dto/section-context.dto';
 import { v4 as uuid } from 'uuid';
 import { TestQuestionDTO } from './dto/test-question.dto';
+import { TestFilterDTO } from './dto/test-filters.dto';
+import { ViewTestDTO } from './dto/view-test.dto';
 
 @Injectable()
 export class TestService {
@@ -34,8 +36,24 @@ export class TestService {
     @Inject('S3_CLIENT') private readonly s3: S3Client,
   ) {}
 
-  async addTest(testDTO: TestDTO) {
-    const test = plainToInstance(Test, testDTO);
+  async addTest(testDTO: TestDTO, file: Express.Multer.File) {
+    const fileKey = uuid();
+    const bucketName = process.env.S3_BUCKET;
+
+    await this.s3.send(
+      new PutObjectCommand({
+        Bucket: bucketName,
+        Key: fileKey,
+        Body: file.buffer,
+        ACL: 'public-read',
+      }),
+    );
+
+    const s3Url = `${process.env.S3_BASE_URL}/${fileKey}`;
+    const test = plainToInstance(Test, {
+      ...testDTO,
+      image_url: s3Url,
+    });
 
     await this.testRepository.save(test);
   }
@@ -53,7 +71,6 @@ export class TestService {
     if (!sectionContextDTO.passage) {
       const fileKey = uuid();
       const bucketName = process.env.S3_BUCKET;
-      console.log(sectionContextDTO);
 
       await this.s3.send(
         new PutObjectCommand({
@@ -82,6 +99,46 @@ export class TestService {
     const question = plainToInstance(TestQuestion, testQuestionDTO);
 
     await this.testQuestionRepository.save(question);
+  }
+
+  async searchTest(
+    testFilterDTO: TestFilterDTO,
+    paginationOptionsDTO: PaginationOptionsDTO,
+  ) {
+    try {
+      const queryBuilder = this.testRepository.createQueryBuilder('test');
+
+      queryBuilder.innerJoinAndSelect('test.category', 'category');
+
+      this.addFilter(queryBuilder, testFilterDTO);
+
+      const [tests, total] = await queryBuilder
+        .offset(paginationOptionsDTO.offset)
+        .limit(paginationOptionsDTO.limit)
+        .getManyAndCount();
+
+      const pagination = this.getPagination(total, paginationOptionsDTO);
+
+      return { items: plainToInstance(ViewTestDTO, tests), pagination };
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  addFilter(
+    queryBuilder: SelectQueryBuilder<Test>,
+    testFilterDTO: TestFilterDTO,
+  ) {
+    if (testFilterDTO.category.length > 0) {
+      queryBuilder.andWhere('category IN (:...categories)', {
+        categories: testFilterDTO.category,
+      });
+    }
+    if (testFilterDTO.difficulty.length > 0) {
+      queryBuilder.andWhere('difficulty IN (:...difficulties)', {
+        difficulties: testFilterDTO.difficulty,
+      });
+    }
   }
 
   getPagination(

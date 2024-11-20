@@ -20,14 +20,16 @@ import { SectionDTO } from './dto/section.dto';
 import { TestQuestionDTO } from './dto/test-question.dto';
 import { TestDTO } from './dto/test.dto';
 import { SectionContextDTO } from './dto/section-context.dto';
+import { TestFilterDTO } from './dto/test-filters.dto';
 
 @Controller('test')
 export class TestController {
   constructor(private readonly testService: TestService) {}
   @Post()
+  @UseInterceptors(FileInterceptor('image'))
   @HttpCode(HttpStatus.CREATED)
-  async addTest(@Body() testDTO: TestDTO) {
-    return this.testService.addTest(testDTO);
+  async addTest(@Body() testDTO: TestDTO, @UploadedFile() file: Express.Multer.File,) {
+    return this.testService.addTest(testDTO, file);
   }
 
   @Post('section')
@@ -50,5 +52,17 @@ export class TestController {
   @HttpCode(HttpStatus.CREATED)
   async addQuestion(@Body() testQuestionDTO: TestQuestionDTO) {  
     return this.testService.addQuestion(testQuestionDTO);
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async filterTest(
+    @Query() testFilterDTO: TestFilterDTO,
+    @Query() paginationOptionsDTO: PaginationOptionsDTO
+  ){
+    return this.testService.searchTest(
+      testFilterDTO,
+      paginationOptionsDTO
+  )
   }
 }
