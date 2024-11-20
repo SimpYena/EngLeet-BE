@@ -21,6 +21,7 @@ import { v4 as uuid } from 'uuid';
 import { TestQuestionDTO } from './dto/test-question.dto';
 import { TestFilterDTO } from './dto/test-filters.dto';
 import { ViewTestDTO } from './dto/view-test.dto';
+import { TestDetailsDTO } from './dto/test-details.dto';
 
 @Injectable()
 export class TestService {
@@ -139,6 +140,16 @@ export class TestService {
         difficulties: testFilterDTO.difficulty,
       });
     }
+  }
+
+  async getTest(id: number){
+    const test = await this.testRepository.findOneBy({id: id})
+    
+    return plainToInstance(TestDetailsDTO, {
+      ...test,
+      skill: 'Listening, Reading',
+      duration: '45 minutes'
+    })
   }
 
   getPagination(

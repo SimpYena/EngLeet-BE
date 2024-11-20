@@ -65,4 +65,11 @@ export class TestController {
       paginationOptionsDTO
   )
   }
+  @Get('/:id')
+  @HttpCode(HttpStatus.OK)
+  async getTestDetails(
+    @GetID('id') id: number,
+  ){
+    return this.testService.getTest(id);
+  }
 }
