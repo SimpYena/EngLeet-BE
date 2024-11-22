@@ -28,5 +28,5 @@ export class SectionContext {
   passage: string;
 
   @OneToMany(() => TestQuestion, (question) => question.section_context)
-  question: TestQuestion;
+  question: TestQuestion[];
 }

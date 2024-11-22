@@ -22,6 +22,8 @@ import { TestQuestionDTO } from './dto/test-question.dto';
 import { TestFilterDTO } from './dto/test-filters.dto';
 import { ViewTestDTO } from './dto/view-test.dto';
 import { TestDetailsDTO } from './dto/test-details.dto';
+import { ListeningViewDTO } from './dto/view-listening-test.dto';
+import { ReadingViewDTO } from './dto/view-reading-test.dto';
 
 @Injectable()
 export class TestService {
@@ -142,14 +144,66 @@ export class TestService {
     }
   }
 
-  async getTest(id: number){
-    const test = await this.testRepository.findOneBy({id: id})
-    
+  async getTest(id: number) {
+    const test = await this.testRepository.findOneBy({ id: id });
+
     return plainToInstance(TestDetailsDTO, {
       ...test,
       skill: 'Listening, Reading',
-      duration: '45 minutes'
-    })
+      duration: '45 minutes',
+    });
+  }
+
+  async getListeningTest(id: number) {
+    const queryBuilder = this.sectionRepository.createQueryBuilder('section');
+
+    queryBuilder.innerJoinAndSelect(
+      'section.sectionContext',
+      'section_context',
+    );
+
+    queryBuilder.innerJoinAndSelect(
+      'section_context.question',
+      'test_question',
+    );
+
+    queryBuilder.andWhere('test_id = :test_id', {
+      test_id: id,
+    });
+
+    queryBuilder.andWhere('type = :type', {
+      type: 'Listening',
+    });
+
+    const listeningTest = await queryBuilder.getMany();
+
+    return { items: plainToInstance(ListeningViewDTO, listeningTest) };
+  }
+
+  async getReadingTest(id: number) {
+    const queryBuilder = this.sectionRepository.createQueryBuilder('section');
+
+    queryBuilder.innerJoinAndSelect(
+      'section.sectionContext',
+      'section_context',
+    );
+
+    queryBuilder.innerJoinAndSelect(
+      'section_context.question',
+      'test_question',
+    );
+
+    queryBuilder.andWhere('test_id = :test_id', {
+      test_id: id,
+    });
+
+    queryBuilder.andWhere('type = :type', {
+      type: 'Reading',
+    });
+
+    const readingTest = await queryBuilder.getMany();
+
+    return { items: plainToInstance(ReadingViewDTO, readingTest) };
   }
 
   getPagination(

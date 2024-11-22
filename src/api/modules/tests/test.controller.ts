@@ -72,4 +72,20 @@ export class TestController {
   ){
     return this.testService.getTest(id);
   }
+
+  @Get('/:id/listening')
+  @HttpCode(HttpStatus.OK)
+  async getListeningTest(
+    @GetID('id') id: number
+  ){
+    return this.testService.getListeningTest(id);
+  }
+
+  @Get('/:id/reading')
+  @HttpCode(HttpStatus.OK)
+  async getReadingTest(
+    @GetID('id') id: number
+  ){
+    return this.testService.getReadingTest(id);
+  }
 }
