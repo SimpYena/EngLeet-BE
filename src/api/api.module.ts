@@ -13,6 +13,7 @@ import { MailerModule } from "@nestjs-modules/mailer";
 import { MailConfig } from "src/config/mail.config";
 import { QuizzModule } from "./modules/quizz/quizz.module";
 import { TestModule } from "./modules/tests/test.module";
+import { AiModule } from "./modules/AI/ai.module";
 
 
 @Module({
@@ -30,7 +31,8 @@ import { TestModule } from "./modules/tests/test.module";
         I18nModule.forRoot(I18nConfig),
         UsersModule,
         QuizzModule,
-        TestModule
+        TestModule,
+        AiModule
     ],
     providers: [
         {
