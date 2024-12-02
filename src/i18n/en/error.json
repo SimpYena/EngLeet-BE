@@ -24,6 +24,11 @@
     "title": "User authentication expired",
     "message": "The expiration date of user authentication has expired. Please start over again from the beginning."
   },
+  "SYS-0006": {
+    "error_id": "SYS-0006",
+    "title": "Not found",
+    "message": "Not found"
+  },
   "AUTH-0001": {
     "error_id": "AUTH-0001",
     "field": "{field}",

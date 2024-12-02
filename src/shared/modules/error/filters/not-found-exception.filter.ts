@@ -17,7 +17,7 @@ export class NotFoundExceptionFilter implements ExceptionFilter {
     );
 
     let errorId = exception.getResponse().message;
-    if (errorId !== 'SYS-0003') errorId = 'SYS-0004';
+    if (errorId !== 'SYS-0003') errorId = 'SYS-0006';
 
     const body = this.errorService.handleException(
       errorId,
