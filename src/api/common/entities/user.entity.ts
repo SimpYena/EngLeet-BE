@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, DeleteDateColumn, CreateDateColumn, OneToMany } from "typeorm";
 import { Review } from "./review.entity";
 import { QuizzSubmitted } from "./quizz-submitted.entity";
+import { AssessmentTest } from "./assessment-test.entity";
 
 @Entity('users')
 export class User {
@@ -37,7 +38,10 @@ export class User {
     @OneToMany(() => Review, (review) => review.user)
     review: Review;
 
-    @OneToMany(() => QuizzSubmitted, (quizzSubmit) => quizzSubmit.quizz)
+    @OneToMany(() => QuizzSubmitted, (quizzSubmit) => quizzSubmit.user)
     quizzSubmit: QuizzSubmitted;
+
+    @OneToMany(() => AssessmentTest, (assessment) => assessment.user)
+    assessment: AssessmentTest;
   }
 
