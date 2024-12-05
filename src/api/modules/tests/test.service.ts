@@ -41,7 +41,7 @@ export class TestService {
 
   async addTest(testDTO: TestDTO, file: Express.Multer.File) {
     const fileKey = uuid();
-    const bucketName = process.env.S3_BUCKET;
+    const bucketName = process.env.S3_IMAGE_BUCKET;
 
     await this.s3.send(
       new PutObjectCommand({

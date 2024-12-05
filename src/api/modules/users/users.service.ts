@@ -3,6 +3,7 @@ import {
   BadRequestException,
   NotFoundException,
   UnauthorizedException,
+  Inject,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Repository } from 'typeorm/repository/Repository';
@@ -22,6 +23,9 @@ import { AccessToken } from 'src/api/common/entities/access-token.entity';
 import { RefreshToken } from 'src/api/common/entities/refresh-token.entity';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { UserProfileDTO } from './dto/user-profile.dto';
+import { v4 as uuid } from 'uuid';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class UsersService {
@@ -34,6 +38,7 @@ export class UsersService {
     private jwtServices: JwtService,
     @InjectQueue('send-mail')
     private sendMailQueue: Queue,
+    @Inject('S3_CLIENT') private readonly s3: S3Client,
   ) {}
 
   async register(createUserDTO: CreateUserDto) {
@@ -236,12 +241,10 @@ export class UsersService {
   }
   async verifyEmail(token: string): Promise<void> {
     try {
-            
       const payload = await this.jwtServices.verifyAsync(
         token,
         VerifyTokenConfig,
       );
-      
 
       await this.userRepository.update(
         { id: payload.id },
@@ -254,7 +257,7 @@ export class UsersService {
       throw new UnauthorizedException('AUTH-0009');
     }
   }
-  
+
   async logout(payload: any) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -291,5 +294,36 @@ export class UsersService {
     }
 
     return currentUser;
+  }
+  async updateProfile(
+    user: any,
+    userProfileDTO: UserProfileDTO,
+    file: Express.Multer.File,
+  ) {
+    try {
+      if (!file) {
+        await this.userRepository.update({ id: user.userId }, {full_name: userProfileDTO.full_name});
+        return;
+      }
+      const fileKey = uuid();
+      const bucketName = process.env.S3_IMAGE_BUCKET;
+  
+      await this.s3.send(
+        new PutObjectCommand({
+          Bucket: bucketName,
+          Key: fileKey,
+          Body: file.buffer,
+          ACL: 'public-read',
+        }),
+      );
+  
+      const s3Url = `${process.env.S3_BASE_URL}/${fileKey}`;
+  
+      await this.userRepository.update({id: user.userId}, {full_name: userProfileDTO.full_name, image_link: s3Url})
+    } catch (error) {
+      console.log(error);
+      
+    }
+
   }
 }

@@ -10,6 +10,8 @@ import { JwtStrategy } from './strategies/jwt-strategy';
 import { RefreshTokenJwtStrategy } from './strategies/refresh-token-jwt.strategy';
 import { BullModule } from '@nestjs/bull';
 import { EmailConsumers } from './consumer/email.consumers';
+import { S3Config } from 'src/config/s3.config';
+import { S3Client } from '@aws-sdk/client-s3';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, AccessToken, RefreshToken]),
@@ -24,6 +26,14 @@ import { EmailConsumers } from './consumer/email.consumers';
     EmailConsumers,
     JwtStrategy,
     RefreshTokenJwtStrategy,
+    {
+      provide: 'S3_CLIENT',
+      useFactory: () =>{
+        const s3ClientConfig =  S3Config();
+        return new S3Client(s3ClientConfig);
+      } 
+      
+    },
   ],
 })
 export class UsersModule {}
