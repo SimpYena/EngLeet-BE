@@ -35,6 +35,12 @@ export class User {
     @Column({ nullable: true })
     last_login?: Date;
 
+    @Column({ nullable: true })
+    image_link: string;
+
+    @Column({ nullable: true })
+    level: number;
+
     @OneToMany(() => Review, (review) => review.user)
     review: Review;
 

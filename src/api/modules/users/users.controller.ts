@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, UseGuards, Request, Param, Patch, Delete, Get, Req } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, UseGuards, Request, Param, Patch, Delete, Get, Req, Put, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { plainToInstance } from 'class-transformer';
@@ -7,6 +7,8 @@ import { TokenDTO } from './dto/token.dto';
 import { RefreshTokenJwtGuard } from './guards/refresh-token-auth.guard';
 import { JwtGuard } from './guards/jwt-auth.guard';
 import { ViewUserDTO } from './dto/view-user.dto';
+import { UserProfileDTO } from './dto/user-profile.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('auth')
 export class UsersController {
@@ -54,5 +56,12 @@ export class UsersController {
       ViewUserDTO,
       await this.usersService.getCurrentUser(req.user),
     );
+  }
+
+  @UseGuards(JwtGuard)
+  @Put('profile')
+  @UseInterceptors(FileInterceptor('image'))
+  async updateProfile(@UploadedFile() file: Express.Multer.File, @Req() req, @Body() userProfileDTO: UserProfileDTO) {
+    return this.usersService.updateProfile(req.user, userProfileDTO, file);
   }
 }
