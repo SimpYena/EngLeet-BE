@@ -24,6 +24,7 @@ import { ViewTestDTO } from './dto/view-test.dto';
 import { TestDetailsDTO } from './dto/test-details.dto';
 import { ListeningViewDTO } from './dto/view-listening-test.dto';
 import { ReadingViewDTO } from './dto/view-reading-test.dto';
+import { AnswerListDTO } from './dto/answer-test.dto';
 
 @Injectable()
 export class TestService {
@@ -204,6 +205,33 @@ export class TestService {
     const readingTest = await queryBuilder.getMany();
 
     return { items: plainToInstance(ReadingViewDTO, readingTest) };
+  }
+
+  async submitTest(id: number, answers: AnswerListDTO[]) {
+    const questionIds = answers.map((answer:any) => answer.question_id)
+    
+    const testQuestions = await this.testQuestionRepository.findByIds(questionIds);
+
+    console.log(testQuestions);
+    
+    const validationResult = answers.map((answer:any) => {
+      const question = testQuestions.find((q) => q.id === answer.question_id);
+      if (!question) {
+        return {
+          question_id: answer.question_id,
+          answer: answer.answer,
+          status: 'Question not found',
+        };
+      } 
+      const isCorrect = question.correct_answer === answer.answer;
+      return {
+        question_id: answer.question_id,
+        answer: answer.answer,
+        correct_answer: question.correct_answer,
+        status: isCorrect ? 'Correct' : 'Incorrect',
+      };
+    });
+    return validationResult;
   }
 
   getPagination(
