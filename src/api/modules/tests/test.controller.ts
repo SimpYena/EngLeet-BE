@@ -21,6 +21,7 @@ import { TestQuestionDTO } from './dto/test-question.dto';
 import { TestDTO } from './dto/test.dto';
 import { SectionContextDTO } from './dto/section-context.dto';
 import { TestFilterDTO } from './dto/test-filters.dto';
+import { AnswerListDTO } from './dto/answer-test.dto';
 
 @Controller('test')
 export class TestController {
@@ -87,5 +88,13 @@ export class TestController {
     @GetID('id') id: number
   ){
     return this.testService.getReadingTest(id);
+  }
+  @Post('/:id/submit')
+  @HttpCode(HttpStatus.CREATED)
+  async submitTest(
+    @GetID('id') id: number,
+    @Body() answerListDTO: AnswerListDTO[]
+  ){
+    return this.testService.submitTest(id, answerListDTO);
   }
 }

@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, DeleteDateCol
 import { Review } from "./review.entity";
 import { QuizzSubmitted } from "./quizz-submitted.entity";
 import { AssessmentTest } from "./assessment-test.entity";
+import { TestSubmitted } from "./test-submitted.entity";
 
 @Entity('users')
 export class User {
@@ -49,5 +50,8 @@ export class User {
 
     @OneToMany(() => AssessmentTest, (assessment) => assessment.user)
     assessment: AssessmentTest;
+
+    @OneToMany(() => TestSubmitted, (testSubmitted) => testSubmitted.user)
+    testSubmitted: TestSubmitted;
   }
 
