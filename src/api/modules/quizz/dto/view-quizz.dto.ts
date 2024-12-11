@@ -20,4 +20,7 @@ export class ViewQuizzDTO{
 
     @Expose()
     type: string;
+
+    @Expose()
+    status: boolean;
 }
