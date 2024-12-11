@@ -45,11 +45,13 @@ export class QuizzController {
   @HttpCode(HttpStatus.OK)
   async getQuizz(
     @Query() searchParamsDTO: SearchParamsDTO,
-    @Query() paginationOptionsDTO: PaginationOptionsDTO
+    @Query() paginationOptionsDTO: PaginationOptionsDTO,
+    @Req() req
   ){
     return this.quizzService.searchQuizz(
         searchParamsDTO,
-        paginationOptionsDTO
+        paginationOptionsDTO,
+        req.user
     )
   }
 

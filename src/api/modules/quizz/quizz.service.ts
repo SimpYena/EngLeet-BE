@@ -75,11 +75,23 @@ export class QuizzService {
   async searchQuizz(
     searchParamsDTO: SearchParamsDTO,
     paginationOptionsDTO: PaginationOptionsDTO,
+    user: any,
   ) {
     try {
       const queryBuilder = this.quizzRepository.createQueryBuilder('quizz');
 
-      queryBuilder.innerJoinAndSelect('quizz.topic', 'topic');
+      queryBuilder
+        .innerJoinAndSelect('quizz.topic', 'topic')
+        .leftJoin(
+          'quizz.quizzSubmit',
+          'quizz_submitted',
+          'quizz_submitted.user_id = :userId',
+          { userId: user.userId },
+        )
+        .addSelect(
+          `CASE WHEN quizz_submitted.user_id IS NOT NULL THEN 1 ELSE 0 END`,
+          'status',
+        );
 
       if (searchParamsDTO.keyword) {
         queryBuilder.andWhere('quizz.title LIKE :keyword', {
@@ -89,10 +101,17 @@ export class QuizzService {
 
       this.addFilter(queryBuilder, searchParamsDTO);
 
-      const [quizzes, total] = await queryBuilder
+      const { entities: quizzes, raw } = await queryBuilder
         .offset(paginationOptionsDTO.offset)
         .limit(paginationOptionsDTO.limit)
-        .getManyAndCount();
+        .getRawAndEntities();
+
+      quizzes.forEach((quiz: any, index) => {
+        const rawQuiz = raw[index];
+        quiz.status = rawQuiz.status;
+      });
+
+      const total = await queryBuilder.getCount();
 
       const pagination = this.getPagination(total, paginationOptionsDTO);
 
