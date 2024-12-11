@@ -55,6 +55,7 @@ export class TestController {
     return this.testService.addQuestion(testQuestionDTO);
   }
 
+  @UseGuards(JwtGuard)
   @Get()
   @HttpCode(HttpStatus.OK)
   async filterTest(
@@ -66,6 +67,7 @@ export class TestController {
       paginationOptionsDTO
   )
   }
+  @UseGuards(JwtGuard)
   @Get('/:id')
   @HttpCode(HttpStatus.OK)
   async getTestDetails(
@@ -74,6 +76,7 @@ export class TestController {
     return this.testService.getTest(id);
   }
 
+  @UseGuards(JwtGuard)
   @Get('/:id/listening')
   @HttpCode(HttpStatus.OK)
   async getListeningTest(
@@ -82,6 +85,7 @@ export class TestController {
     return this.testService.getListeningTest(id);
   }
 
+  @UseGuards(JwtGuard)
   @Get('/:id/reading')
   @HttpCode(HttpStatus.OK)
   async getReadingTest(
@@ -89,6 +93,8 @@ export class TestController {
   ){
     return this.testService.getReadingTest(id);
   }
+
+  @UseGuards(JwtGuard)
   @Post('/:id/submit')
   @HttpCode(HttpStatus.CREATED)
   async submitTest(
