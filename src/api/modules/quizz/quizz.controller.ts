@@ -40,6 +40,7 @@ export class QuizzController {
     return this.quizzService.createListeningQuizz(file, listeningQuizz);
   }
 
+  @UseGuards(JwtGuard)
   @Get()
   @HttpCode(HttpStatus.OK)
   async getQuizz(
@@ -52,6 +53,7 @@ export class QuizzController {
     )
   }
 
+  @UseGuards(JwtGuard)
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async getQuizzById(@GetID('id') id: number){
