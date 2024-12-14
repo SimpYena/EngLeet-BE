@@ -7,10 +7,11 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AssessmentTest } from 'src/api/common/entities/assessment-test.entity';
 import { GeneratedTest } from 'src/api/common/entities/generated-test.entity';
+import { User } from 'src/api/common/entities/user.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AssessmentTest, GeneratedTest])],
+  imports: [TypeOrmModule.forFeature([AssessmentTest, GeneratedTest, User])],
   controllers: [AiController],
   providers: [AiService, Groq,
     {

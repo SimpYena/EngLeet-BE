@@ -12,6 +12,8 @@ import { GeneratedTest } from 'src/api/common/entities/generated-test.entity';
 import { Type } from 'src/api/common/enum/type.enum';
 import { plainToInstance } from 'class-transformer';
 import { TestListDTO } from './dto/test-list.dto';
+import { User } from 'src/api/common/entities/user.entity';
+import { Result } from './interface/result.interface';
 @Injectable()
 export class AiService {
   constructor(
@@ -20,7 +22,9 @@ export class AiService {
     @InjectRepository(AssessmentTest)
     private readonly testAssessmentRepository: Repository<AssessmentTest>,
     @InjectRepository(GeneratedTest)
-    private readonly generatedTestRepository: Repository<GeneratedTest>
+    private readonly generatedTestRepository: Repository<GeneratedTest>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
   ) {
     this.groq = new Groq({
       apiKey: process.env.GROQ_API_KEY,
@@ -272,7 +276,7 @@ export class AiService {
       });
 
       if (user) {
-        await this.testAssessmentRepository.delete(userInfo.userId);
+        await this.testAssessmentRepository.delete({user:{id: userInfo.userId}});
       }
 
       await this.testAssessmentRepository.save({
@@ -373,6 +377,14 @@ export class AiService {
       });
 
       const response = chatCompetion.choices[0].message.content;
+
+      const result:Result = JSON.parse(response);
+
+      const existUser = this.userRepository.findOneBy({
+        id: user.userId
+      })
+
+      await this.userRepository.update({id: user.userId},{level: result.level})
 
       return JSON.parse(response);
     } catch (error) {
