@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import Groq from 'groq-sdk';
 import { TestOptionDTO } from './dto/test-option.dto';
 import { ElevenLabsClient } from 'elevenlabs/Client';
@@ -399,4 +399,15 @@ export class AiService {
     })
   return plainToInstance(TestListDTO, tests);
   }
+  async getTest(user:any, id: number){
+    const test = await this.generatedTestRepository.findOneBy({
+      user: {id: user.userId},
+      id: id
+    })
+    if(!test){
+      throw new BadRequestException('SYS-0006');
+    }
+    return test;
+  }
+
 }

@@ -3,6 +3,7 @@ import { TestOptionDTO } from './dto/test-option.dto';
 import { AiService } from './ai.service';
 import { JwtGuard } from '../users/guards/jwt-auth.guard';
 import { AwnswerDTO } from './dto/answer.dto';
+import { GetID } from 'src/api/common/decorator/get-id.decorator';
 
 @Controller('generate')
 export class AiController {
@@ -34,5 +35,10 @@ export class AiController {
     @Get('test')
     async getListTest(@Req() req){
         return this.aiService.getListTest(req.user);
+    }
+    @UseGuards(JwtGuard)
+    @Get('test/:id')
+    async getTest(@Req() req, @GetID('id') id: number) {
+        return this.aiService.getTest(req.user, id);
     }
 }
