@@ -25,6 +25,7 @@ import { TestDetailsDTO } from './dto/test-details.dto';
 import { ListeningViewDTO } from './dto/view-listening-test.dto';
 import { ReadingViewDTO } from './dto/view-reading-test.dto';
 import { AnswerListDTO } from './dto/answer-test.dto';
+import { TestSubmitted } from 'src/api/common/entities/test-submitted.entity';
 
 @Injectable()
 export class TestService {
@@ -38,6 +39,8 @@ export class TestService {
     @InjectRepository(TestQuestion)
     private readonly testQuestionRepository: Repository<TestQuestion>,
     @Inject('S3_CLIENT') private readonly s3: S3Client,
+    @InjectRepository(TestSubmitted)
+    private readonly testSubmittedRepository: Repository<TestSubmitted>,
   ) {}
 
   async addTest(testDTO: TestDTO, file: Express.Multer.File) {
@@ -207,31 +210,58 @@ export class TestService {
     return { items: plainToInstance(ReadingViewDTO, readingTest) };
   }
 
-  async submitTest(id: number, answers: AnswerListDTO[]) {
-    const questionIds = answers.map((answer:any) => answer.question_id)
-    
-    const testQuestions = await this.testQuestionRepository.findByIds(questionIds);
+  async submitTest(id: number, answers: AnswerListDTO[], user: any) {
+    try {
+      const questionIds = answers.map((answer: any) => answer.question_id);
+      console.log(id);
+      const testQuestions =
+        await this.testQuestionRepository.findByIds(questionIds);
 
-    console.log(testQuestions);
-    
-    const validationResult = answers.map((answer:any) => {
-      const question = testQuestions.find((q) => q.id === answer.question_id);
-      if (!question) {
+      const validationResult: object = answers.map((answer: any) => {
+        const question = testQuestions.find((q) => q.id === answer.question_id);
+        if (!question) {
+          return {
+            question_id: answer.question_id,
+            answer: answer.answer,
+            status: 'Question not found',
+          };
+        }
+        const isCorrect = question.correct_answer === answer.answer;
         return {
           question_id: answer.question_id,
           answer: answer.answer,
-          status: 'Question not found',
+          correct_answer: question.correct_answer,
+          status: isCorrect ? 'Correct' : 'Incorrect',
         };
-      } 
-      const isCorrect = question.correct_answer === answer.answer;
-      return {
-        question_id: answer.question_id,
-        answer: answer.answer,
-        correct_answer: question.correct_answer,
-        status: isCorrect ? 'Correct' : 'Incorrect',
-      };
+      });
+
+      await this.testSubmittedRepository.save({
+        history: validationResult,
+        user: { id: user.userId },
+        test: { id: id },
+      });
+      return validationResult;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  async getResult(id: number, user: any) {
+    const test = await this.testRepository.findOneBy({ id: id });
+
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+
+    const testSubmitted = await this.testSubmittedRepository.findOneBy({
+      test: { id: id },
+      user: { id: user.userId },
     });
-    return validationResult;
+
+    if (!testSubmitted) {
+      throw new BadRequestException('Test not submitted');
+    }
+
+    return testSubmitted.history;
   }
 
   getPagination(

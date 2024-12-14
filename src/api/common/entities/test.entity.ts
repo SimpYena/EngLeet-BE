@@ -12,6 +12,7 @@ import {
 import { Section } from './section.entity';
 import { Difficulty } from '../enum/difficulty.enum';
 import { TestCategory } from './test-category.entity';
+import { TestSubmitted } from './test-submitted.entity';
 
 @Entity('test')
 export class Test {
@@ -48,4 +49,7 @@ export class Test {
 
   @OneToMany(() => Section, (section) => section.test)
   section: Section;
+
+  @OneToMany(() => TestSubmitted, (testSubmitted) => testSubmitted.test)
+  testSubmitted: TestSubmitted;
 }

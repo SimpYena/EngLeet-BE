@@ -99,8 +99,18 @@ export class TestController {
   @HttpCode(HttpStatus.CREATED)
   async submitTest(
     @GetID('id') id: number,
-    @Body() answerListDTO: AnswerListDTO[]
+    @Body() answerListDTO: AnswerListDTO[],
+    @Req() req: any
   ){
-    return this.testService.submitTest(id, answerListDTO);
+    return this.testService.submitTest(id, answerListDTO, req.user);
   }
-}
+
+  @UseGuards(JwtGuard)
+  @Get('/:id/result')
+  @HttpCode(HttpStatus.OK)
+  async getResult(
+    @GetID('id') id: number,
+    @Req() req: any
+  ){
+    return this.testService.getResult(id, req.user);
+  }}
