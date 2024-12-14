@@ -18,6 +18,9 @@ import { ViewQuizzDTO } from './dto/view-quizz.dto';
 import { Quizz } from 'src/api/common/entities/quizz.entity';
 import { QuizzDetailDTO } from './dto/quizz-details.dto';
 import { QuizzSubmitted } from 'src/api/common/entities/quizz-submitted.entity';
+import { ReviewDTO } from './dto/review.dto';
+import { Review } from 'src/api/common/entities/review.entity';
+import { ViewReviewDTO } from './dto/view-review.dto';
 
 @Injectable()
 export class QuizzService {
@@ -27,7 +30,9 @@ export class QuizzService {
     @Inject('S3_CLIENT') private readonly s3: S3Client,
     @InjectRepository(QuizzSubmitted)
     private readonly quizzSubmittedRepository: Repository<QuizzSubmitted>,
-  ) {}
+    @InjectRepository(Review)
+    private readonly reviewRepository: Repository<Review>
+  ) { }
 
   async createReadingQuizz(readingQuizz: ReadingQuizzDTO) {
     if (readingQuizz.type !== 'Reading') {
@@ -271,5 +276,43 @@ export class QuizzService {
       score: 0,
       attempt: attempt + 1,
     };
+  }
+  async comment(id: number, user: any, review: ReviewDTO) {
+    const quizz = await this.quizzRepository.findOneBy({ id: id });
+
+    if (!quizz) {
+      throw new BadRequestException('BAD-0001')
+    }
+
+    await this.reviewRepository.save({
+      quizz: { id: id },
+      user: { id: user.userId },
+      description: review.description
+    })
+  }
+  async getComment(id: number, user: any) {
+    try {
+
+      const reviews = await this.reviewRepository.createQueryBuilder('review')
+        .innerJoinAndSelect('review.user', 'user')
+        .innerJoinAndSelect('review.quizz', 'quizz')
+        .where('review.quizz_id = :id', { id })
+        .getMany()
+      console.log(reviews);
+
+
+      return reviews.map((review) => ({
+        id: review.id,
+        description: review.description,
+        user: {
+          full_name: review.user.full_name,
+          image_url: review.user.image_link,
+        }
+      }));
+
+    } catch (error) {
+      console.log(error);
+
+    }
   }
 }

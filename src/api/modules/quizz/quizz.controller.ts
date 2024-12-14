@@ -19,6 +19,7 @@ import { SearchParamsDTO } from './dto/search-params.dto';
 import { PaginationOptionsDTO } from 'src/api/common/dto/pagination-options.dto';
 import { GetID } from 'src/api/common/decorator/get-id.decorator';
 import { JwtGuard } from '../users/guards/jwt-auth.guard';
+import { ReviewDTO } from './dto/review.dto';
 
 @Controller('quizz')
 export class QuizzController {
@@ -67,5 +68,19 @@ export class QuizzController {
   @HttpCode(HttpStatus.OK)
   async submitQuizz(@GetID('id') id: number, @Req() req, @Body() answer){
     return this.quizzService.submitQuizz(id, req.user, answer);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post(':id/review')
+  @HttpCode(HttpStatus.OK)
+  async comment(@GetID('id') id: number, @Req() req, @Body() review: ReviewDTO){
+    return this.quizzService.comment(id, req.user, review);
+  }
+  
+  @UseGuards(JwtGuard)
+  @Get(':id/review')
+  @HttpCode(HttpStatus.OK)
+  async getComment(@GetID('id') id: number, @Req() req){
+    return this.quizzService.getComment(id, req.user);
   }
 }

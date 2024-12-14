@@ -9,15 +9,15 @@ export class AiController {
     constructor(
         private readonly aiService: AiService
     ){}
-
+    @UseGuards(JwtGuard)
     @Post('reading')
-    async generateReadingSection(@Body() testOptionDTO: TestOptionDTO) {
-        return this.aiService.generateReadingSection(testOptionDTO);
+    async generateReadingSection(@Body() testOptionDTO: TestOptionDTO, @Req() req) {
+        return this.aiService.generateReadingSection(testOptionDTO, req.user);
     }
-    
+    @UseGuards(JwtGuard)
     @Post('listening')
-    async generateListeningSection(@Body() testOptionDTO: TestOptionDTO){
-        return this.aiService.generateListeningSection(testOptionDTO);
+    async generateListeningSection(@Body() testOptionDTO: TestOptionDTO, @Req() req){
+        return this.aiService.generateListeningSection(testOptionDTO, req.user);
     }
     @UseGuards(JwtGuard)
     @Get('assessment')
@@ -29,5 +29,10 @@ export class AiController {
     @Post('submit')
     async submitAssessment(@Req() req, @Body() answerDTO: AwnswerDTO) {
         return this.aiService.submitAssessment(req.user, answerDTO);
+    }
+    @UseGuards(JwtGuard)
+    @Get('test')
+    async getListTest(@Req() req){
+        return this.aiService.getListTest(req.user);
     }
 }

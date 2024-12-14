@@ -3,6 +3,7 @@ import { Review } from "./review.entity";
 import { QuizzSubmitted } from "./quizz-submitted.entity";
 import { AssessmentTest } from "./assessment-test.entity";
 import { TestSubmitted } from "./test-submitted.entity";
+import { GeneratedTest } from "./generated-test.entity";
 
 @Entity('users')
 export class User {
@@ -53,5 +54,8 @@ export class User {
 
     @OneToMany(() => TestSubmitted, (testSubmitted) => testSubmitted.user)
     testSubmitted: TestSubmitted;
+
+    @OneToMany(() => GeneratedTest, (generatedTest) => generatedTest.user)
+    generatedTest: GeneratedTest;
   }
 
