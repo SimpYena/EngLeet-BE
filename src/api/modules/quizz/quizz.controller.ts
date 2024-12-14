@@ -83,4 +83,11 @@ export class QuizzController {
   async getComment(@GetID('id') id: number, @Req() req){
     return this.quizzService.getComment(id, req.user);
   }
+  
+  @UseGuards(JwtGuard)
+  @Get('view/leaderboard')
+  @HttpCode(HttpStatus.OK)
+  async getLeaderboard(@Query() paginationOptionsDTO: PaginationOptionsDTO){
+    return this.quizzService.getLeaderboard(paginationOptionsDTO);
+  }
 }

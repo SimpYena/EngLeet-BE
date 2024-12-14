@@ -21,6 +21,7 @@ import { QuizzSubmitted } from 'src/api/common/entities/quizz-submitted.entity';
 import { ReviewDTO } from './dto/review.dto';
 import { Review } from 'src/api/common/entities/review.entity';
 import { ViewReviewDTO } from './dto/view-review.dto';
+import { LeaderBoardDTO } from './dto/leaderboard.dto';
 
 @Injectable()
 export class QuizzService {
@@ -314,5 +315,35 @@ export class QuizzService {
       console.log(error);
 
     }
+  }
+  async getLeaderboard(paginationOptionsDTO: PaginationOptionsDTO) {
+    try {
+      const queryBuilder = this.quizzSubmittedRepository.createQueryBuilder('quizz_submitted')
+      queryBuilder.select('quizz_submitted.user_id', 'user_id')
+        .addSelect('user.full_name', 'full_name')
+        .addSelect('user.image_link', 'image_link')
+        .addSelect('SUM(quizz_submitted.score)', 'totalScore')
+        .addSelect('COUNT(DISTINCT quizz_submitted.quizz_id)', 'totalQuizzes')
+        .addSelect('MAX(quizz_submitted.attempt)', 'maxAttempt')
+        .innerJoin('users', 'user', 'user.id = quizz_submitted.user_id')
+        .groupBy('quizz_submitted.user_id')
+        .orderBy('SUM(quizz_submitted.score)', 'DESC')
+        .addOrderBy('COUNT(DISTINCT quizz_submitted.quizz_id)', 'DESC')
+        .addOrderBy('MAX(quizz_submitted.attempt)', 'ASC')
+
+      const result = await queryBuilder
+        .offset(paginationOptionsDTO.offset)
+        .limit(paginationOptionsDTO.limit)
+        .getRawAndEntities();
+
+      const { raw } = result;
+      const pagination = this.getPagination(raw.length, paginationOptionsDTO);
+      return { items: plainToInstance(LeaderBoardDTO, raw), pagination }
+
+    } catch (error) {
+      console.log(error);
+
+    }
+
   }
 }
