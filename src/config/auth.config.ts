@@ -29,3 +29,7 @@ export const VerifyTokenConfig = {
   expiresIn: process.env.VERIFY_EXPIRATION_TIME,
 };
 
+export const ForgotTokenConfig = {
+  secret: process.env.FORGOT_SECRET,
+  expiresIn: process.env.FORGOT_EXPIRATION_TIME
+}

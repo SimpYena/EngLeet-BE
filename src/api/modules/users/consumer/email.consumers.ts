@@ -19,4 +19,20 @@ export class EmailConsumers {
       },
     });
   }
+  @Process('forgot-password')
+  async sendMailResetPassword(job: Job<unknown>){
+
+    console.log(job.data['mailURL']);
+    
+    await this.mailerService.sendMail({
+      to: job.data['to'],
+      subject: 'Engleet Reset Password Email',
+      template: './forgot-password',
+      context: {
+        code: 'Reset your password',
+        forgotToken: job.data['forgotToken'],
+        mailURL: job.data['mailURL'],
+      },
+    });
+  }
 }

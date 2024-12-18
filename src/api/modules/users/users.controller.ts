@@ -9,6 +9,8 @@ import { JwtGuard } from './guards/jwt-auth.guard';
 import { ViewUserDTO } from './dto/view-user.dto';
 import { UserProfileDTO } from './dto/user-profile.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ForgotPasswordDTO } from './dto/forgot-password.dto';
+import { ResetPasswordDTO } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class UsersController {
@@ -63,5 +65,14 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('image'))
   async updateProfile(@UploadedFile() file: Express.Multer.File, @Req() req, @Body() userProfileDTO: UserProfileDTO) {
     return this.usersService.updateProfile(req.user, userProfileDTO, file);
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() forgotPasswordDTO: ForgotPasswordDTO){
+    return this.usersService.forgotPassword(forgotPasswordDTO);
+  }
+  @Patch('update-password/:token')
+  async resetPassword(@Param('token') token: string,@Body() resetPasswordDTO: ResetPasswordDTO){
+    return this.usersService.resetPassword(token, resetPasswordDTO);
   }
 }

@@ -29,6 +29,11 @@
     "title": "Not found",
     "message": "Not found"
   },
+  "SYS-0007": {
+    "error_id": "SYS-0007",
+    "title": "Email not found",
+    "message": "Your email is not existed, please enter the existing email"
+  },
   "AUTH-0001": {
     "error_id": "AUTH-0001",
     "field": "{field}",
@@ -73,6 +78,11 @@
     "error_id": "AUTH-0010",
     "title": "Token Expired",
     "message": "Token is expired."
+  },
+  "AUTH-0011": {
+    "error_id": "AUTH-0011",
+    "title": "Invalid token",
+    "message": "There is an error when verify your request reset password, please try again."
   },
   "FILE-0001":{
     "error_id": "FILE-0001",
