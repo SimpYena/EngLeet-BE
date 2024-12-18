@@ -16,6 +16,7 @@ import { DataSource, QueryRunner } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import {
   AccessTokenConfig,
+  ForgotTokenConfig,
   RefreshTokenConfig,
   VerifyTokenConfig,
 } from 'src/config/auth.config';
@@ -26,6 +27,8 @@ import { Queue } from 'bull';
 import { UserProfileDTO } from './dto/user-profile.dto';
 import { v4 as uuid } from 'uuid';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { ForgotPasswordDTO } from './dto/forgot-password.dto';
+import { ResetPasswordDTO } from './dto/reset-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -325,5 +328,47 @@ export class UsersService {
       
     }
 
+  }
+  async forgotPassword(forgotPasswordDTO: ForgotPasswordDTO){
+    const existUser = await this.userRepository.findOneBy({email: forgotPasswordDTO.email})
+
+    if(!existUser){
+      throw new BadRequestException('SYS-0007')
+    }
+
+    const payload = { id: existUser.id };
+
+    const forgotToken = await this.jwtServices.signAsync(
+      payload,
+      ForgotTokenConfig,
+    );
+
+    const mailURL = process.env.FORGOT_PASSWORD_URL;
+
+    await this.sendMailQueue.add('forgot-password', {
+      to: existUser.email,
+      forgotToken,
+      mailURL,
+    });
+  }
+  async resetPassword(token: string, resetPasswordDTO: ResetPasswordDTO){
+    try {
+      const payload = await this.jwtServices.verifyAsync(
+        token,
+        ForgotTokenConfig,
+      );
+
+      const hashedPassword = await bcrypt.hash(resetPasswordDTO.password, 10)
+
+      await this.userRepository.update(
+        { id: payload.id },
+        { hashed_password: hashedPassword},
+      );
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('AUTH-0010');
+      }
+      throw new UnauthorizedException('AUTH-0009');
+    }
   }
 }
