@@ -29,4 +29,10 @@ export class QuizzDetailDTO {
 
   @Expose()
   audio_link: string;
+
+  @Expose()
+  previousQuizz: JSON;
+
+  @Expose()
+  nextQuizz: JSON;
 }

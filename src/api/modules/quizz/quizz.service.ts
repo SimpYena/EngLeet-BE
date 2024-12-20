@@ -147,6 +147,14 @@ export class QuizzService {
       });
     }
   }
+
+  parseQuizzOverall(quizz: Quizz) {
+    return {
+      id: quizz.id,
+      title: quizz.title,
+    };
+  }
+
   async getQuizzDetails(id: number) {
     const queryBuilder = this.quizzRepository.createQueryBuilder('quizz');
 
@@ -162,6 +170,12 @@ export class QuizzService {
       throw new NotFoundException('SYS-0003');
     }
 
+    const previousQuizz = await this.quizzRepository
+      .createQueryBuilder('quizz')
+      .where('quizz.id < :id', { id })
+      .orderBy('quizz.id', 'DESC')
+      .getOne();
+
     const nextQuizz = await this.quizzRepository
       .createQueryBuilder('quizz')
       .where('quizz.id > :id', { id })
@@ -172,8 +186,9 @@ export class QuizzService {
       ...plainToInstance(QuizzDetailDTO, {
         ...quizz,
         audio_link: quizz.audio_link,
+        nextQuizz: nextQuizz ? this.parseQuizzOverall(nextQuizz) : null,
+        previousQuizz: previousQuizz ? this.parseQuizzOverall(previousQuizz) : null,
       }),
-      nextQuizzId: nextQuizz ? nextQuizz.id : null,
     };
   }
 
