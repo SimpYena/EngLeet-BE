@@ -56,7 +56,7 @@ export class TestService {
       }),
     );
 
-    const s3Url = `${process.env.S3_BASE_URL}/${fileKey}`;
+    const s3Url = `${process.env.S3_IMAGE_URL}/${fileKey}`;
     const test = plainToInstance(Test, {
       ...testDTO,
       image_url: s3Url,
