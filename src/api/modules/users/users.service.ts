@@ -320,7 +320,7 @@ export class UsersService {
         }),
       );
   
-      const s3Url = `${process.env.S3_BASE_URL}/${fileKey}`;
+      const s3Url = `${process.env.S3_IMAGE_URL}/${fileKey}`;
   
       await this.userRepository.update({id: user.userId}, {full_name: userProfileDTO.full_name, image_link: s3Url})
     } catch (error) {

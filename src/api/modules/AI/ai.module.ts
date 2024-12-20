@@ -8,12 +8,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AssessmentTest } from 'src/api/common/entities/assessment-test.entity';
 import { GeneratedTest } from 'src/api/common/entities/generated-test.entity';
 import { User } from 'src/api/common/entities/user.entity';
+import { Pinecone } from '@pinecone-database/pinecone';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AssessmentTest, GeneratedTest, User])],
+  imports: [TypeOrmModule.forFeature([AssessmentTest, GeneratedTest, User]),
+],
   controllers: [AiController],
-  providers: [AiService, Groq,
+  providers: [AiService, Groq, GoogleGenerativeAI,
     {
       provide: 'S3_CLIENT', 
       useFactory: () =>{
