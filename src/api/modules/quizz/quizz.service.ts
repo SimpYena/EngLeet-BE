@@ -162,10 +162,19 @@ export class QuizzService {
       throw new NotFoundException('SYS-0003');
     }
 
-    return plainToInstance(QuizzDetailDTO, {
-      ...quizz,
-      audio_link: quizz.audio_link,
-    });
+    const nextQuizz = await this.quizzRepository
+      .createQueryBuilder('quizz')
+      .where('quizz.id > :id', { id })
+      .orderBy('quizz.id', 'ASC')
+      .getOne();
+
+    return {
+      ...plainToInstance(QuizzDetailDTO, {
+        ...quizz,
+        audio_link: quizz.audio_link,
+      }),
+      nextQuizzId: nextQuizz ? nextQuizz.id : null,
+    };
   }
 
   getPagination(
