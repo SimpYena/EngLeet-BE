@@ -14,6 +14,10 @@ import { plainToInstance } from 'class-transformer';
 import { TestListDTO } from './dto/test-list.dto';
 import { User } from 'src/api/common/entities/user.entity';
 import { Result } from './interface/result.interface';
+import { ChatDTO } from './dto/chat.dto';
+import { ChatGroq } from '@langchain/groq';
+import { Pinecone } from '@pinecone-database/pinecone';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 @Injectable()
 export class AiService {
   constructor(
@@ -24,11 +28,13 @@ export class AiService {
     @InjectRepository(GeneratedTest)
     private readonly generatedTestRepository: Repository<GeneratedTest>,
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
+    private readonly genAI: GoogleGenerativeAI
   ) {
     this.groq = new Groq({
       apiKey: process.env.GROQ_API_KEY,
     });
+    this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
   }
 
   async generateReadingSection(testOptionDTO: TestOptionDTO, userInfo: any): Promise<JSON> {
@@ -409,5 +415,61 @@ export class AiService {
     }
     return test;
   }
+  async chatWithAI(chatDTO: ChatDTO){
+    const pinecone = new Pinecone({
+      apiKey: process.env.PINECONE_API_KEY,
+    });
+    const index = pinecone.Index('engleet-chatbot')
 
+    try {
+      const queryEmbedding = await this.createEmbedding(chatDTO.message);
+
+    const searchResults = await index.query({
+      vector: queryEmbedding,
+      topK: 5,
+      includeMetadata: true,
+    });
+
+    const context = searchResults.matches
+    .map((match: any) => match.metadata.text)
+    .join("\n");
+
+    const prompt = `
+    Use the following pieces of information to answer the user's question.
+    If you don't know the answer, just say that you don't know. don't try to make up an answer.
+    Context: ${context}
+
+    User Question: ${chatDTO.message}
+
+    Only return the helpful answer below and nothing else.
+    Helpful answer:
+  `;
+
+    const llm = new ChatGroq({
+      model: "mixtral-8x7b-32768",
+      temperature: 0.7,
+      maxTokens: 3000,
+      maxRetries: 2,
+    });
+
+    const aiMsg = await llm.invoke([
+      {
+        role: "system",
+        content:
+          "You are a helpful assistant.",
+      },
+      { role: "user", content: prompt },
+    ]);
+    
+    return aiMsg.content;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async createEmbedding(text: string): Promise<number[]>{
+    const model = this.genAI.getGenerativeModel({model:"text-embedding-004"})
+    const response = await model.embedContent(text)
+    return response.embedding.values.slice(0, 384);
+  }
 }
