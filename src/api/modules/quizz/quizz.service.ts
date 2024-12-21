@@ -22,6 +22,8 @@ import { ReviewDTO } from './dto/review.dto';
 import { Review } from 'src/api/common/entities/review.entity';
 import { ViewReviewDTO } from './dto/view-review.dto';
 import { LeaderBoardDTO } from './dto/leaderboard.dto';
+import { User } from 'src/api/common/entities/user.entity';
+import { RecommendQuizzDTO } from './dto/recommend-quizz.dto';
 
 @Injectable()
 export class QuizzService {
@@ -32,7 +34,9 @@ export class QuizzService {
     @InjectRepository(QuizzSubmitted)
     private readonly quizzSubmittedRepository: Repository<QuizzSubmitted>,
     @InjectRepository(Review)
-    private readonly reviewRepository: Repository<Review>
+    private readonly reviewRepository: Repository<Review>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
   ) { }
 
   async createReadingQuizz(readingQuizz: ReadingQuizzDTO) {
@@ -370,4 +374,39 @@ export class QuizzService {
     }
 
   }
+  async getRecommendQuizz(user: any) {
+    const existUser = await this.userRepository.findOneBy({ id: user.userId });
+  
+    if (!existUser.level) {
+      throw new BadRequestException('User must complete an assessment test to get a level');
+    }
+  
+    const queryBuilder = this.quizzRepository.createQueryBuilder('quizz');
+  
+    let difficulty: string;
+  
+    if (existUser.level === 1) {
+      difficulty = 'Easy';
+    } else if (existUser.level === 2 || existUser.level === 3) {
+      difficulty = 'Medium';
+    } else if (existUser.level === 4 || existUser.level === 5) {
+      difficulty = 'Hard';
+    } else {
+      throw new BadRequestException('Invalid user level');
+    }
+  
+    const recommendedQuizzes = await queryBuilder
+      .leftJoin(
+        'quizz.quizzSubmit',
+        'quizz_submitted',
+        'quizz_submitted.user_id = :userId',
+        { userId: user.userId },
+      )
+      .where('quizz.difficulty = :difficulty', { difficulty })
+      .andWhere('quizz_submitted.id IS NULL')
+      .getOne();
+  
+    return plainToInstance(RecommendQuizzDTO,recommendedQuizzes);
+  }
+  
 }

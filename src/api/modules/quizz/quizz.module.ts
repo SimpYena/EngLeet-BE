@@ -7,9 +7,10 @@ import { S3Config } from 'src/config/s3.config';
 import { Quizz } from 'src/api/common/entities/quizz.entity';
 import { QuizzSubmitted } from 'src/api/common/entities/quizz-submitted.entity';
 import { Review } from 'src/api/common/entities/review.entity';
+import { User } from 'src/api/common/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Quizz, QuizzSubmitted, Review])],
+  imports: [TypeOrmModule.forFeature([Quizz, QuizzSubmitted, Review, User])],
   controllers: [QuizzController],
   providers: [
     QuizzService,

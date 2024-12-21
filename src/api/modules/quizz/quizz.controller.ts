@@ -90,4 +90,11 @@ export class QuizzController {
   async getLeaderboard(@Query() paginationOptionsDTO: PaginationOptionsDTO){
     return this.quizzService.getLeaderboard(paginationOptionsDTO);
   }
+
+  @UseGuards(JwtGuard)
+  @Get('recommend/view')
+  @HttpCode(HttpStatus.OK)
+  async getRecommendQuizz(@Req() req){
+    return this.quizzService.getRecommendQuizz(req.user);
+  }
 }
