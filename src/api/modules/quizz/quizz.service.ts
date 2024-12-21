@@ -193,6 +193,7 @@ export class QuizzService {
         nextQuizz: nextQuizz ? this.parseQuizzOverall(nextQuizz) : null,
         previousQuizz: previousQuizz ? this.parseQuizzOverall(previousQuizz) : null,
       }),
+      title: quizz.title,
     };
   }
 
