@@ -113,4 +113,12 @@ export class TestController {
     @Req() req: any
   ){
     return this.testService.getResult(id, req.user);
-  }}
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('view/recently')
+  @HttpCode(HttpStatus.OK)
+  async getRecentlyTest(){
+    return this.testService.getRecentlyTest();
+  }
+}
