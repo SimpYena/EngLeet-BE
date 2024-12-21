@@ -409,5 +409,16 @@ export class QuizzService {
   
     return plainToInstance(RecommendQuizzDTO,recommendedQuizzes);
   }
+  async getStreaks(user:any){
+    const queryBuilder = this.quizzSubmittedRepository.createQueryBuilder('quizz_submitted')
+    .select("DATE_FORMAT(quizz_submitted.created_at, '%Y-%m-%d')", 'date')
+    .where('quizz_submitted.user_id = :userId', { userId: user.userId })
+    .groupBy('date')
+    .orderBy('date', 'ASC')
+
+    const submittedDates = await queryBuilder.getRawMany();
+
+    return submittedDates.map((entry) => entry.date);
+  }
   
 }
