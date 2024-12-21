@@ -26,6 +26,7 @@ import { ListeningViewDTO } from './dto/view-listening-test.dto';
 import { ReadingViewDTO } from './dto/view-reading-test.dto';
 import { AnswerListDTO } from './dto/answer-test.dto';
 import { TestSubmitted } from 'src/api/common/entities/test-submitted.entity';
+import { TestPreviewDTO } from './dto/test-preview.dto';
 
 @Injectable()
 export class TestService {
@@ -41,7 +42,7 @@ export class TestService {
     @Inject('S3_CLIENT') private readonly s3: S3Client,
     @InjectRepository(TestSubmitted)
     private readonly testSubmittedRepository: Repository<TestSubmitted>,
-  ) {}
+  ) { }
 
   async addTest(testDTO: TestDTO, file: Express.Multer.File) {
     const fileKey = uuid();
@@ -262,6 +263,17 @@ export class TestService {
     }
 
     return testSubmitted.history;
+  }
+  async getRecentlyTest() {
+    const queryBuilder = this.testRepository.createQueryBuilder('test');
+
+    queryBuilder.orderBy('test.created_at').limit(4)
+
+    queryBuilder.limit(4)
+    const tests = await queryBuilder.getMany();
+
+    return { items: plainToInstance(TestPreviewDTO, tests) };
+
   }
 
   getPagination(
