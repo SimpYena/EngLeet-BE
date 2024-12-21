@@ -97,4 +97,11 @@ export class QuizzController {
   async getRecommendQuizz(@Req() req){
     return this.quizzService.getRecommendQuizz(req.user);
   }
+
+  @UseGuards(JwtGuard)
+  @Get('user/streaks')
+  @HttpCode(HttpStatus.OK)
+  async getStreaks(@Req() req){
+    return this.quizzService.getStreaks(req.user);
+  }
 }

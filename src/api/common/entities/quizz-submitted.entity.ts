@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
 import { Quizz } from "./quizz.entity";
 
@@ -20,4 +20,7 @@ export class QuizzSubmitted {
 
     @Column()
     attempt: number;
+
+    @CreateDateColumn({ nullable: false })
+    created_at: Date;
 }
