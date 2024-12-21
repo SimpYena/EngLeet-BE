@@ -20,4 +20,7 @@ export class ViewUserDTO {
 
   @Expose()
   last_login: Date;
+
+  @Expose()
+  level: number;
 }
