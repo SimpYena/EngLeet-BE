@@ -71,6 +71,10 @@ export class UsersController {
   async forgotPassword(@Body() forgotPasswordDTO: ForgotPasswordDTO){
     return this.usersService.forgotPassword(forgotPasswordDTO);
   }
+  @Get('verifiy-reset-password/:token')
+  async verifyResetPassword(@Param('token') token: string){
+    return this.usersService.verifyResetPassword(token);
+  }
   @Patch('update-password/:token')
   async resetPassword(@Param('token') token: string,@Body() resetPasswordDTO: ResetPasswordDTO){
     return this.usersService.resetPassword(token, resetPasswordDTO);
