@@ -420,8 +420,8 @@ export class AiService {
       apiKey: process.env.PINECONE_API_KEY,
     });
     const index = pinecone.Index('engleet-chatbot')
-
-    try {
+    
+    try { 
       const queryEmbedding = await this.createEmbedding(chatDTO.message);
 
     const searchResults = await index.query({
@@ -448,7 +448,7 @@ export class AiService {
     const llm = new ChatGroq({
       model: "mixtral-8x7b-32768",
       temperature: 0.7,
-      maxTokens: 3000,
+      maxTokens: 10000,
       maxRetries: 2,
     });
 
