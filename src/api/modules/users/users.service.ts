@@ -351,6 +351,27 @@ export class UsersService {
       mailURL,
     });
   }
+  async verifyResetPassword(token: string){
+    try{
+    const payload = await this.jwtServices.verifyAsync(
+      token,
+      ForgotTokenConfig,
+    );
+
+    const user = await this.userRepository.findOneBy({id: payload.id});
+
+    if(!user) {
+      throw new UnauthorizedException('AUTH-0009');
+    }
+  } catch(error){
+    if (error.name === 'TokenExpiredError') {
+      throw new UnauthorizedException('AUTH-0010');
+    }
+    return error;
+  }
+
+
+  }
   async resetPassword(token: string, resetPasswordDTO: ResetPasswordDTO){
     try {
       const payload = await this.jwtServices.verifyAsync(
