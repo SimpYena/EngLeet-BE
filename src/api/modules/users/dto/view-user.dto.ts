@@ -25,5 +25,5 @@ export class ViewUserDTO {
   level: number;
 
   @Expose()
-  image_url: string;
+  image_link: string;
 }
